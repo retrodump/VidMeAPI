@@ -5,7 +5,7 @@ This is an entry-level extracted API for VidMe. Right now it can just upload vid
 
 ## Settings
 
-In order to set up your account, just copy and paste 'settings.json.example' to 'settings.json' and add your username and password. If you would rather not, if you do not add a username or password, it will prompt you for it when you run it. Please be aware it is stored in plain text.
+In order to set up your account, just copy and paste 'settings.json.example' to 'settings.json' and add your username and password. If you would rather not, if you do not add a username or password, it will prompt you for the ones you didn't add when you run it. Please be aware it is stored in plain text.
 
 Example:
 
