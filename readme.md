@@ -15,7 +15,7 @@ Example:
 
 ## Upload
 
-To upload a video, just do `python main.py c:/dir/dir/myvideo.mp4`.
+To upload a video, just do `python main.py "c:/dir/dir/myvideo.mp4"`.
 
 You could also just set the varible in `main.py`:
 
