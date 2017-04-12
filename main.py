@@ -8,7 +8,7 @@ import os.path
 def main():
 	settings = get_settings('settings')
 
-	video_filename = "C:/somedir/another/myvide.mp4"
+	video_filename = "C:/somedir/another/myvideo.mp4"
 
 	if len(sys.argv) > 0 and sys.argv[1]:
 		video_filename = sys.argv[1]
