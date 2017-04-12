@@ -1,4 +1,6 @@
+#!/usr/bin/python
 
+import sys
 import vidme
 import json
 import os.path
@@ -6,12 +8,22 @@ import os.path
 def main():
 	settings = get_settings('settings')
 
+	video_filename = "C:/somedir/another/myvide.mp4"
+
+	if len(sys.argv) > 0 and sys.argv[1]:
+		video_filename = sys.argv[1]
+
+	print "Uploading file:", video_filename
+
 	user = vidme.User(settings, no_output=True)
-	video = vidme.Video(uri = "C:/videos/my video.mp4")
+	video = vidme.Video(uri = video_filename)
 
 	video_upload = video.upload(user, "Test Video", no_output=False)
 
-	print video_upload['full_url']
+	if video_upload:
+		print video_upload['full_url']
+	else:
+		print "[-] Failed to upload video."
 
 """
 

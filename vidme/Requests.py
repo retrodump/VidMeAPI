@@ -6,8 +6,6 @@ API_URL = "https://api.vid.me"
 def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):    
     headers = {}
 
-    headers['Authorization'] = "Basic Zm9vOmJhcg=="
-
     if extraheaders is not None:
         headers.update(extraheaders)
     if token is not None:

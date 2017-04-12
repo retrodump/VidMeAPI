@@ -10,8 +10,8 @@ class Video:
 		self.url = url
 		self.uri = uri
 
-		# Upload in 1 MB chunks
-		self.chunk_size = 1024 * 100000
+		# Upload in 10 MB chunks
+		self.chunk_size = 1024 * 1000
 
 	def upload(self, user, title = "", no_output=False):
 		if not self.uri:
@@ -60,10 +60,12 @@ class Video:
 				chunk_upload = {'state': ""}
 
 				if not no_output:
-					print "[+] Upload is at 0%"
+					print "[+] Upload is uploading..."
 
 				while chunk_request and (len(chunk) < self.chunk_size or chunk_upload['state'] == 'complete'):
-					chunk = f.read(self.chunk_size)
+					# chunk = f.read(self.chunk_size)
+					# It's not liking chunk_size....It wants the file as 1 entire chunk.
+					chunk = f.read()
 					chunk_request = Requests.request('/upload/chunk', params=dict(
 						code=code,
 						upload=upload_id,
@@ -75,7 +77,8 @@ class Video:
 						chunk_upload = chunk_request['upload']
 
 						if not no_output:
-							print "[+] Upload is at {}%".format((float(chunk_upload['size_completed']) / float(chunk_upload['size_total']) * 100.0))
+							print "[+] File is uploading..."
+							# print "[+] Upload is at {}%".format((float(chunk_upload['size_completed']) / float(chunk_upload['size_total']) * 100.0))
 					else:
 						if not no_output:
 							print "[+] Upload is at 100%"
