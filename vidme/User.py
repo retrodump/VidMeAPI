@@ -1,6 +1,6 @@
 
 # import readline
-import Requests
+import api
 
 class User:
 
@@ -39,7 +39,7 @@ class User:
 		else:
 			password = self.password
 
-		request = Requests.request('/auth/create', data=dict(
+		request = api.request('/auth/create', data=dict(
 			username=username,
 			password=password,
 			Authorization="Basic"

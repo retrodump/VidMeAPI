@@ -6,6 +6,8 @@ API_URL = "https://api.vid.me"
 def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):    
     headers = {}
 
+    print "Going for:", API_URL + uri
+
     if extraheaders is not None:
         headers.update(extraheaders)
     if token is not None:
