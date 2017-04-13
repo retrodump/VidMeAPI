@@ -161,7 +161,7 @@ Gettings:
 * `get_thumbnail_url()`
 * `get_score()`
 * `get_private()`
-* `get_total_watchers()
+* `get_total_watchers()`
 * `get_watcher_countries()`
 * `get_uri()` - Location of file on your disk. Only set if you set it.
 
@@ -229,7 +229,7 @@ Setters:
 Operations:
 
 * `follow_user(session, user)` - `user`: user to follow. Is a class User.
-* `unfollow_user(self, session, user)` - `user`: user to unfollow. Is a class User.
+* `unfollow_user(session, user)` - `user`: user to unfollow. Is a class User.
 * `unsubscribe_user(session, user)` - `user`: user to unsubscribe. Is a class User.
 
 ### Comments
