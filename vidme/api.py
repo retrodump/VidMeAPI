@@ -6,8 +6,6 @@ API_URL = "https://api.vid.me"
 def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):    
     headers = {}
 
-    print "Going for:", API_URL + uri
-
     if extraheaders is not None:
         headers.update(extraheaders)
     if token is not None:
@@ -23,10 +21,18 @@ def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):
     result = func(API_URL + uri, headers=headers, **kwargs)
  
     result_json = result.json()
+    
+    print "url:", result.url
 
     if result.status_code >= 400:
-        if result_json['code'] != "internal_server_error":
+        print "uri:", uri
+        print "headers:", extraheaders
+        print "result text:", result.text
+        print "result code:", result.status_code
+        if result_json and 'code' in result_json and result_json['code'] != "internal_server_error":
             print "request failed!", result_json['code'], result_json['error']
+        else:
+            print "request failed!!!", result_json
         return False
  
     if result_json is None or not 'status' in result_json or result_json['status'] is False:

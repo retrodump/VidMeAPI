@@ -8,13 +8,15 @@ from Comment import Comment
 
 class Video:
 
-	def __init__(self, url = "", uri = "", video_id = "", code = ""):
+	def __init__(self, url = "", uri = "", video_id = "", code = "", meta = ""):
 		self.url = url
 		self.uri = uri
 		self.video_id = video_id
 		self.code = code
 
-		if url or video_id or code:
+		if meta:
+			self.set_meta(meta)
+		elif url or video_id or code:
 			self.set_meta(self.retrieve_meta())
 
 		# Upload in 2.5 MB chunks
@@ -38,12 +40,6 @@ class Video:
 
 	def set_meta(self, meta):
 		# Confirm meta is good
-		if 'status' in meta:
-			if not meta['status']:
-				return False
-		else:
-			return False
-
 		self.meta = meta
 
 		if 'video' in meta:
@@ -76,13 +72,12 @@ class Video:
 		video_id = self._get_safe('video_id')
 
 		if video_id:
-			print '/video/' + video_id + '/comments'
 			comments = api.request('/video/' + video_id + '/comments', data=dict(
 				order=order,
 				direction=direction
 			), method='GET')
 
-			if comments and 'status' in comments and comments['status']:
+			if comments:
 				self.comments = [
 					Comment(comment) for comment in comments['comments']
 				]
@@ -105,11 +100,11 @@ class Video:
 		else:
 			return False
 
-	def upload(self, user, title = "", no_output=False):
+	def upload(self, session, title = "", no_output=False):
 		if not self.uri:
 			print "[-] No uri given!"
 			return False
-		elif not user.get_token() and not user.new_token():
+		elif not session.get_token() and not session.new_token():
 			return False
 
 		if os.path.isfile(self.uri):
@@ -125,7 +120,7 @@ class Video:
 				size=file_size,
 				title=title,
 				mode='chunked',
-				token=user.get_token()
+				token=session.get_token()
 			))
 
 			if not video_request:
@@ -139,7 +134,7 @@ class Video:
 			upload = api.request('/upload/create', data=dict(
 				code=code,
 				size=file_size,
-				token=user.get_token()
+				token=session.get_token()
 			))
 
 			if not no_output:
@@ -151,23 +146,21 @@ class Video:
 
 			with open(self.uri, 'rb') as f:
 				chunk_request = True
-				chunk_upload = {'state': ""}
 
 				if not no_output:
-					print "[+] Upload is uploading..."
+					print "[+] Video is uploading..."
 
 				chunk_request = api.request('/upload/chunk', params=dict(
 					code=code,
 					upload=upload_id,
-					token=user.get_token()
+					token=session.get_token()
 				), data=self._read_chunks(f, file_size, self.chunk_size))
 
 				if chunk_request:
 					finished_video = chunk_request['video']
-					chunk_upload = chunk_request['upload']
 
 					if not no_output:
-						print "[+] Upload is at 100%."
+						print "[+] Video is done uploading."
 				else:
 					if not no_output:
 						print "[-] File failed to upload."
@@ -196,19 +189,106 @@ class Video:
 			print "[*] Upload at: " + str(math.ceil(count / file_size * 100)) + ("%.")
 			chunk_count -= 1
 
-	def delete(self, user):
+	def _api_call(self, session, action, args = {}):
 		video_id = self._get_safe('video_id')
 
-		if video_id:
-			video_delete = api.request('/video/' + video_id + '/delete', data=dict(
-					token=user.get_token()
-				))
+		args['token'] = session.get_token()
 
-			if video_delete and 'status' in video_delete and video_delete['status']
+		if video_id:
+			video_action = api.request('/video/' + video_id + '/' + action, data=args)
+
+			if video_action:
 				return True
 			else:
 				return False
 		return False
+
+	def delete(self, session):
+		return self._api_call(session, 'delete')
+
+	def set_title(self, session, title):
+		return self._api_call(session, 'edit', dict(title=title))
+
+	def set_description(self, session, description):
+		return self._api_call(session, 'edit', dict(description=description))
+
+	def set_source(self, session, source):
+		return self._api_call(session, 'edit', dict(source=source))
+
+	def set_private(self, session, private = True):
+		return self._api_call(session, 'edit', dict(private=private))
+
+	def set_public(self, session, private = False):
+		return set_private(session, private)
+
+	def set_latitude(self, session, latitude):
+		return self._api_call(session, 'edit', dict(latitude=latitude))
+
+	def set_longitude(self, session, longitude):
+		return self._api_call(session, 'edit', dict(longitude=longitude))
+
+	def set_place_id(self, session, place_id):
+		return self._api_call(session, 'edit', dict(place_id=place_id))
+
+	def set_place_name(self, session, place_name):
+		return self._api_call(session, 'edit', dict(place_name=place_name))
+
+	def set_nsfw(self, session):
+		return self._api_call(session, 'edit', dict(nsfw=True))
+
+	def flag(self, session, flag = 1):
+		return self._api_call(session, 'flag', dict(value=flag))
+
+	def vote(self, session, vote = True, time = 0.0):
+		if vote:
+			vote = 1
+		else:
+			vote = 0
+
+		return self._api_call(session, 'vote', dict(value=vote, time=time))
+
+	def set_thumbnail(self, session, thumb, no_output=False):
+		return False
+		#######
+		# Doesn't work lol
+		# Also tried using /video/:/thumbnail with no luck.
+		#######
+
+		# video_id = self._get_safe('video_id')
+
+		# if video_id:
+		# 	if os.path.isfile(thumb):
+		# 		with open(thumb, 'rb') as f:
+		# 			chunk_request = True
+
+		# 			if not no_output:
+		# 				print "[+] Thumbnail is uploading..."
+
+		# 			file_info = os.stat(thumb)
+		# 			file_size = file_info.st_size
+
+		# 			chunk_request = api.request('/video/' + video_id + '/edit',
+		# 				params=dict(
+		# 					token=session.get_token()
+		# 				),
+		# 				data=dict(
+		# 					thumbnail=self._read_chunks(f, file_size, self.chunk_size)
+		# 				)
+		# 			)
+
+		# 			print chunk_request
+
+		# 			if not no_output:
+		# 				print "[+] Thumbnail is done uploading."
+
+		# 			if chunk_request:
+		# 				return True
+		# 			else:
+		# 				return False
+		# 	else:
+		# 		return False
+		# else:
+		# 	return False
 
 	def get_uri(self):
 		return self.uri

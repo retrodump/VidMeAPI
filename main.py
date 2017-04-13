@@ -5,7 +5,7 @@ import vidme
 import json
 import os.path
 
-user = None
+session = None
 operations = {
 	'upload': 'upload_video',
 	'comments': 'get_comments'
@@ -14,8 +14,8 @@ operations = {
 def main():
 	settings = get_settings('settings')
 
-	global user
-	user = vidme.User(settings, no_output=True)
+	global session
+	session = vidme.Session(settings, no_output=True)
 
 	args = sys.argv
 
@@ -25,10 +25,78 @@ def main():
 		run_command(args[1].lower(), args[2:])
 
 """
-
+ 
 	Test Case Functions
 
 """
+
+def get_videos(username):
+	return get_user_by_username(username).get_videos()
+
+def is_blocked(username, other_username):
+	return get_user_by_username(username).is_blocked(get_user_by_username(other_username))
+
+def is_following(username, other_username):
+	return get_user_by_username(username).is_following(get_user_by_username(other_username))
+
+def get_following(username):
+	return get_user_by_username(username).get_following()
+
+def get_followers(username):
+	return get_user_by_username(username).get_followers()
+
+def get_video_views(username):
+	return get_user_by_username(username).get_video_views()
+
+def get_user_by_user_id(user_id):
+	return vidme.User(user_id=user_id)
+
+def get_user_by_username(username):
+	return vidme.User(username=username)
+
+def get_search_by_likes(term):
+	return vidme.get_search(term, order='likes_count')
+
+def get_search(term):
+	# nsfw (1 for true, 0 for false)
+	# order (string :: 'likes_count', 'hot_score', 'date_completed')
+	# user (string)
+	return vidme.get_serach(term)
+
+def get_new():
+	# nsfw (1 for true, 0 for false)
+	return vidme.get_new()
+
+def get_trending():
+	# offset (int)
+	# limit (int)
+	return vidme.get_trending()
+
+def get_hot():
+	# subindex (int)
+	# offset (int)
+	# limit (int)
+	return vidme.get_hot()
+
+def list_featured_videos(count = 5):
+	# offset (int)
+	# limit (int)
+	# marker (string)
+	# order (string)
+	for video in vidme.get_featured(limit=count):
+		print video.get_title()
+
+def get_featured():
+	return vidme.get_featured()
+
+def set_title(url, title):
+	return get_video_by_url(url).set_title(title)
+
+def upvote_video(url):
+	return get_video_by_url(url).vote(session)
+
+def remove_vote(url):
+	return get_video_by_url(url).vote(session, False)
 
 def get_comments(url):
 	comments = get_video_by_url(url).get_comments()
@@ -55,7 +123,7 @@ def upload_video_by_command():
 	upload_video(video_filename)
 
 def upload_video(video_filename, title = "My Super Epic 1337 Video"):
-	if not user: 
+	if not session: 
 		print "User is not set!"
 		return
 
@@ -65,7 +133,7 @@ def upload_video(video_filename, title = "My Super Epic 1337 Video"):
 	video = vidme.Video(uri = video_filename)
 
 	# Upload our file and get if_successful
-	video_upload = video.upload(user, title, no_output=False)
+	video_upload = video.upload(session, title, no_output=False)
 
 	if video_upload:
 		print video.get_title()
