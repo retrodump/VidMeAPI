@@ -73,17 +73,17 @@ class User:
 	def set_username(self, session, username):
 		return self._api_call(session, 'edit', dict(username=username))
 
-	def set_username(self, session, password, passwordCurrent):
+	def set_password(self, session, password, passwordCurrent):
 		return self._api_call(session, 'edit', dict(password=password, passwordCurrent=passwordCurrent))
 
-	def set_username(self, session, bio):
+	def set_bio(self, session, bio):
 		return self._api_call(session, 'edit', dict(bio=bio))
 
-	def set_username(self, session, displayname):
+	def set_displayname(self, session, displayname):
 		return self._api_call(session, 'edit', dict(displayname=displayname))
 
-	def set_username(self, session, email):
-		return self._api_call(session, 'edit', dict(username=email))
+	def set_email(self, session, email):
+		return self._api_call(session, 'edit', dict(email=email))
 
 	def follow_user(self, session, user):
 		return self._api_call(session, 'follow', dict(user=user.get_user_id()))

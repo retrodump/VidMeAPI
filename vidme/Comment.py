@@ -1,4 +1,6 @@
 
+import api
+
 
 class Comment:
 
@@ -27,3 +29,34 @@ class Comment:
 
 	def get_comments(self):
 		return False
+
+	def _get_safe(self, name):
+		if hasattr(self, name):
+			return getattr(self, name)
+		else:
+			return False
+
+	def _api_call(self, session, action, args = {}):
+		comment_id = self._get_safe('comment_id')
+
+		args['token'] = session.get_token()
+
+		if comment_id:
+			video_action = api.request('/comment/' + comment_id + '/' + action, data=args)
+
+			if video_action:
+				return True
+			else:
+				return False
+		return False
+
+	def vote(self, session, vote = True):
+		if vote:
+			vote = 1
+		else:
+			vote = 0
+
+		return self._api_call(session, 'vote', dict(value=vote))
+
+	def vote(self, session):
+		return self._api_call(session, 'delete')
