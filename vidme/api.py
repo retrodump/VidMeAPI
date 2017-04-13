@@ -1,5 +1,5 @@
 
-from requests import get, post
+from requests import get, post, delete
 
 API_URL = "https://api.vid.me"
 
@@ -17,11 +17,15 @@ def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):
         func = post
     elif method == 'GET':
         func = get
+    elif method == 'DELETE':
+        func = delete
  
     result = func(API_URL + uri, headers=headers, **kwargs)
  
     result_json = result.json()
     
+    print "Making call at:", result.url
+
     if result.status_code >= 400:
         print "uri:", uri
         print "headers:", extraheaders

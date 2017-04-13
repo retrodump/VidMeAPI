@@ -30,6 +30,19 @@ def main():
 
 """
 
+def add_video_to_album(album, url):
+	return album.add_video(session, vidme.Video(url=url).get_video_id())
+
+def create_album(title):
+	return vidme.Album().create(session, title)
+
+def get_user_albums(username):
+	return get_user_by_username(username).get_albums()
+
+def get_album(album_id):
+	# 90822
+	return vidme.Album(album_id)
+
 def get_videos(username):
 	return get_user_by_username(username).get_videos()
 

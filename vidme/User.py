@@ -1,5 +1,6 @@
 
 import api
+from Album import Album
 
 
 class User:
@@ -34,9 +35,6 @@ class User:
 
 		return user
 
-	def update(self):
-		self.retrieve_meta()
-
 	def set_meta(self, meta):
 		# Confirm meta is good
 		self.meta = meta
@@ -49,6 +47,35 @@ class User:
 				setattr(self, key, value)
 				# Add getter for item
 				setattr(self, 'get_' + key, lambda v=value: v)
+
+	def _retrieve_albums(self):
+		user_id = self._get_safe('user_id')
+
+		if user_id:
+			albums = api.request('/user/' + user_id + '/albums', method='GET')
+
+			if albums:
+				self.albums = [
+					Album(meta={'album': album}) for album in albums['albums']
+				]
+				return True
+			else:
+				return False
+		else:
+			return False
+
+	def get_albums(self):
+		albums = self._get_safe('albums')
+
+		# If albums not found, try to retrieve them.
+		if not albums: self._retrieve_albums()
+
+		albums = self._get_safe('albums')
+
+		if albums:
+			return albums
+		else:
+			return False
 
 	def _get_safe(self, name):
 		if hasattr(self, name):
@@ -65,6 +92,7 @@ class User:
 			video_action = api.request('/user/' + user_id + '/' + action, data=args)
 
 			if video_action:
+				self.set_meta(video_action)
 				return True
 			else:
 				return False

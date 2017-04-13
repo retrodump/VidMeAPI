@@ -45,6 +45,7 @@ class Comment:
 			video_action = api.request('/comment/' + comment_id + '/' + action, data=args)
 
 			if video_action:
+				self.set_meta(video_action)
 				return True
 			else:
 				return False

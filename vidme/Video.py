@@ -198,6 +198,7 @@ class Video:
 			video_action = api.request('/video/' + video_id + '/' + action, data=args)
 
 			if video_action:
+				self.set_meta(video_action)
 				return True
 			else:
 				return False

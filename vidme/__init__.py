@@ -3,6 +3,7 @@ from Session import Session
 from Video import Video
 from Comment import Comment
 from User import User
+from Album import Album
 
 def _get_videos(videos_type, **kwargs):
 	videos = api.request('/videos/' + videos_type, method="GET", params=kwargs)
