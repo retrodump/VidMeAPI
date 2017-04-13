@@ -7,7 +7,7 @@ This is an entry-level extracted API for VidMe. Right now it can just upload vid
 
 This package needs the following pips:
 
-requests
+* `pip install requests`
 
 Please see `requirements.txt` for an up-to-date list.
 
