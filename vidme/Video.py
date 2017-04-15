@@ -4,7 +4,7 @@ import os.path
 import api
 import math
 from Comment import Comment
-
+from User import User
 
 class Video:
 
@@ -46,10 +46,17 @@ class Video:
 			video = meta['video']
 
 			for key, value in video.items():
-				# Add item to class
-				setattr(self, key, value)
-				# Add getter for item
-				setattr(self, 'get_' + key, lambda v=value: v)
+				if key == 'user':
+					value = User(meta={'user': value})
+					# Add item to class
+					setattr(self, 'user', value)
+					# Add getter for item
+					setattr(self, 'get_' + 'user', lambda v=value: v)
+				else:
+					# Add item to class
+					setattr(self, key, value)
+					# Add getter for item
+					setattr(self, 'get_' + key, lambda v=value: v)
 
 		if 'watchers' in meta:
 			watchers = meta['watchers']

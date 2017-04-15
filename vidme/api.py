@@ -1,16 +1,22 @@
 
 from requests import get, post, delete
 
+import base64
+
 API_URL = "https://api.vid.me"
 
 def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):    
-    headers = {}
+    headers = {
+        'User-Agent': "KingFredrickVI API Interface Bot - https://github.com/KingFredrickVI/VidMeAPI",
+    }
 
     if extraheaders is not None:
         headers.update(extraheaders)
     if token is not None:
         headers['AccessToken'] = token
  
+    print headers
+
     func = post
 
     if method == 'POST':
@@ -24,7 +30,7 @@ def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):
  
     result_json = result.json()
     
-    print "Making call at:", result.url
+    # print "Making call at:", result.url
 
     if result.status_code >= 400:
         print "uri:", uri

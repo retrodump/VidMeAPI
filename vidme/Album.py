@@ -1,7 +1,5 @@
 
 import api
-from Video import Video
-
 
 class Album:
 
@@ -75,7 +73,7 @@ class Album:
 			))
 
 			if video_action:
-				print video_action
+				from Video import Video
 				self.videos.append(Video(video_id=video_action['albumVideo']['video_id']))
 				return True
 			else:

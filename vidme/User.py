@@ -2,7 +2,6 @@
 import api
 from Album import Album
 
-
 class User:
 
 	def __init__(self, username = "", **kwargs):
@@ -197,7 +196,7 @@ class User:
 		else:
 			return False
 
-	def get_videos(self, sort="recent", private=0, session=None, offset=0):
+	def get_videos(self, session=None, order="video_id", limit=0, private=0, offset=0, hard=False):
 		hasGotten = self._get_safe('user_videos')
 
 		if hasGotten and not hard and offset == 0:
@@ -210,16 +209,18 @@ class User:
 				if session:
 					token = session.get_token()
 
-				videos = api.request('/user/' + user_id + "/videos", method="GET", params=dict(
+				videos = api.request('/videos/list', method="GET", params=dict(
 					private=private,
-					sort=sort,
+					order=order,
 					token=token,
-					offset=offset
+					offset=offset,
+					limit=limit,
+					user=user_id
 				))
 
-				print videos
-
 				if videos:
+					from Video import Video
+
 					self.user_videos = [Video(meta={'video': video}) for video in videos['videos']]
 					return self.user_videos
 				else:
