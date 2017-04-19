@@ -172,6 +172,7 @@ print video.get_title()
 Gettings:
 
 * `get_video_id()`
+* `get_likes()`
 * `get_comments()`
 * `get_url()`
 * `get_full_url()`
@@ -276,6 +277,12 @@ video = vidme.Video(video_id = 14854593)
 comments = video.get_comments()
 ```
 
+The limit is 20 by default. To increase the number, just pass as parameter.
+
+```
+likes = video.get_comments(limit=50)
+```
+
 Getters:
 
 * `get_comment_id()`
@@ -296,3 +303,29 @@ Setters:
 
 * `vote(session, vote = True)` - `vote`: upvote if True, take away upvote if false
 * `delete(session)` - Deletes the comment.
+
+### Likes
+
+To get the likes for a video, do the following:
+
+```
+video = vidme.Video(video_id = 14854593)
+
+likes = video.get_likes()
+```
+
+The limit is 20 by default. To increase the number, just pass as parameter.
+
+```
+likes = video.get_likes(limit=50)
+```
+
+Getters:
+
+* `get_vote_id()`
+* `get_video_id()`
+* `get_user_id()` - user_id of the person who liked video
+* `get_value()` - 1 for liked, 0 for not liked. (You can unlike video. If you do, this is set to 0.)
+* `get_date_created()`
+* `get_date_modified()`
+* `get_user()` - Returns a User instance.

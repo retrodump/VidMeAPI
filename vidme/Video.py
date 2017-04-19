@@ -5,6 +5,7 @@ import api
 import math
 from Comment import Comment
 from User import User
+from Like import Like
 
 class Video:
 
@@ -75,13 +76,15 @@ class Video:
 		else:
 			return False
 
-	def _retrieve_comments(self, order = 'comment_id', direction = 'ASC'):
+	def _retrieve_comments(self, limit = 20, offset = 0, order = 'comment_id', direction = 'ASC'):
 		video_id = self._get_safe('video_id')
 
 		if video_id:
-			comments = api.request('/video/' + video_id + '/comments', data=dict(
+			comments = api.request('/video/' + video_id + '/comments', params=dict(
 				order=order,
-				direction=direction
+				direction=direction,
+				limit=limit,
+				offset=offset,
 			), method='GET')
 
 			if comments:
@@ -94,16 +97,50 @@ class Video:
 		else:
 			return False
 
-	def get_comments(self):
+	def get_comments(self, refresh=False, limit=20, offset=0):
 		comments = self._get_safe('comments')
 
 		# If comments not found, try to retrieve them.
-		if not comments: self._retrieve_comments()
+		if refresh or not comments: self._retrieve_comments(limit, offset)
 
 		comments = self._get_safe('comments')
 
 		if comments:
 			return comments
+		else:
+			return False
+
+	def _retrieve_likes(self, limit=20, offset = 0, order = 'like_id', direction = 'ASC'):
+		video_id = self._get_safe('video_id')
+
+		if video_id:
+			likes = api.request('/video/' + video_id + '/likes', params=dict(
+				order=order,
+				direction=direction,
+				limit=limit,
+				offset=offset,
+			), method='GET')
+
+			if likes:
+				self.likes = [
+					Like(like) for like in likes['votes']
+				]
+				return True
+			else:
+				return False
+		else:
+			return False
+
+	def get_likes(self, refresh=False, limit=20, offset=0):
+		likes = self._get_safe('likes')
+
+		# If likes not found, try to retrieve them.
+		if refresh or not likes: self._retrieve_likes(limit, offset)
+
+		likes = self._get_safe('likes')
+
+		if likes:
+			return likes
 		else:
 			return False
 

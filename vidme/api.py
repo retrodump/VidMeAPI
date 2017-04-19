@@ -30,7 +30,7 @@ def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):
  
     result_json = result.json()
     
-    # print "Making call at:", result.url
+    print "Making call at:", result.url
 
     if result.status_code >= 400:
         print "uri:", uri

@@ -13,6 +13,7 @@ operations = {
 }
 
 def main():
+	print get_likes_for_video('https://vid.me/gRWu')
 	settings = get_settings('settings')
 
 	global session
@@ -30,6 +31,9 @@ def main():
 	Test Case Functions
 
 """
+
+def get_likes_for_video(url):
+	return get_video_by_url(url).get_likes()
 
 def add_video_to_album(album, url):
 	return album.add_video(session, vidme.Video(url=url).get_video_id())
