@@ -3,6 +3,8 @@
 
 This is an entry-level extracted API for VidMe. Right now it can just upload videos but I plan on adding more in the future.
 
+GitHub IO Page: https://kingfredrickvi.github.io/VidMeAPI/
+
 ## Installation
 
 This package needs the following pips:
