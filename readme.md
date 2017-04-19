@@ -27,6 +27,36 @@ To upload a video, just do `python main.py upload "c:/dir/dir/myvideo.mp4" "titl
 
 If you do not give it a title, the name of the video will be used.
 
+## Commands
+
+`<string>` means it's required. `[string]` means it's optional to have. If the argument you are passing as a space in it, you need to wrap it in quotes.
+
+Example: 
+
+Syntax: `command <arg1> [arg2]`
+
+The following would accept: `command hello`, `command hello hi`, `command hello "How are you!"`
+
+### Upload
+
+Syntax:
+
+* `upload <path to video> [title]`
+
+Examples:
+
+* `upload C:\dir\dir\myvideo.mp4`
+* `upload C:\dir\dir\myvideo.mp4 "My cool title!"`
+
+### Upload Folder
+
+* `upload_folder <path to folder> [regex]`
+
+Examples:
+
+* `upload_folder C:\dir\dir\` (By default, targets MP4 files.)
+* `upload_folder C:\dir\dir\ *.avi`
+
 ## Usage
 
 ### General Functions

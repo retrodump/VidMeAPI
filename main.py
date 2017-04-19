@@ -154,12 +154,12 @@ def upload_video(video_filename, title = "My Super Epic 1337 Video"):
 	else:
 		print "[-] Failed to upload video."
 
-def upload_folder(directory):
+def upload_folder(directory, regex = "*.mp4"):
 	import glob
 
 	[
 		vidme.Video(uri=video_uri).upload(session) 
-		for video_uri in glob.glob(directory + "/*.mp4")
+		for video_uri in glob.glob(directory + "/"+ regex)
 	]
 
 """
