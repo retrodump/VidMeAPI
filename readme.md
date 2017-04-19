@@ -23,7 +23,9 @@ Example:
 
 ## Upload
 
-To upload a video, just do `python main.py upload "c:/dir/dir/myvideo.mp4" "title"`.
+To upload a video, just do 
+
+```python main.py upload "c:/dir/dir/myvideo.mp4" "title"```
 
 If you do not give it a title, the name of the video will be used.
 
