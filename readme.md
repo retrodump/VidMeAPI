@@ -23,7 +23,7 @@ Example:
 
 ## Upload
 
-To upload a video, just do 
+To upload a video, just do:
 
 ```python main.py upload "c:/dir/dir/myvideo.mp4" "title"```
 
