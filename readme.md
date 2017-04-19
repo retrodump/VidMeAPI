@@ -31,7 +31,7 @@ If you do not give it a title, the name of the video will be used.
 
 ## Commands
 
-`<string>` means it's required. `[string]` means it's optional to have. If the argument you are passing as a space in it, you need to wrap it in quotes.
+`<string>` means it's required. `[string]` means it's optional to have. If the argument you are passing has a space in it, you need to wrap it in quotes.
 
 Example: 
 
