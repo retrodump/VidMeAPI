@@ -15,7 +15,7 @@ def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):
     if token is not None:
         headers['AccessToken'] = token
  
-    print headers
+    # print headers
 
     func = post
 
