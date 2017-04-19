@@ -8,7 +8,8 @@ import os.path
 session = None
 operations = {
 	'upload': 'upload_video',
-	'comments': 'get_comments'
+	'comments': 'get_comments',
+	'upload_folder': 'upload_folder',
 }
 
 def main():
@@ -152,6 +153,14 @@ def upload_video(video_filename, title = "My Super Epic 1337 Video"):
 		print video.get_title()
 	else:
 		print "[-] Failed to upload video."
+
+def upload_folder(directory):
+	import glob
+
+	[
+		vidme.Video(uri=video_uri).upload(session) 
+		for video_uri in glob.glob(directory + "/*.mp4")
+	]
 
 """
 
