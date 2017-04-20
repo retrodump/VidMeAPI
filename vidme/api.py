@@ -25,7 +25,7 @@ def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):
         func = delete
  
     result = func(API_URL + uri, headers=headers, **kwargs)
- 
+
     # print result.url
 
     result_json = result.json()

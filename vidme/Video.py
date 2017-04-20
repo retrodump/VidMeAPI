@@ -328,6 +328,9 @@ class Video:
 	def flag(self, session, flag = 1):
 		return self._api_call(session, 'flag', dict(value=flag))
 
+	def set_channel(self, session, channel_id):
+		return self._api_call(session, 'edit', dict(channel=channel_id))
+
 	def vote(self, session, vote = True, time = 0.0):
 		if vote:
 			vote = 1
