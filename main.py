@@ -42,14 +42,14 @@ def create_album(title):
 	return vidme.Album().create(session, title)
 
 def get_user_albums(username):
-	return get_user_by_username(username).get_albums()
+	return [album for album in get_user_by_username(username).get_albums()]
 
 def get_album(album_id):
 	# 90822
 	return vidme.Album(album_id)
 
 def get_videos(username):
-	return get_user_by_username(username).get_videos()
+	return [video for video in get_user_by_username(username).get_videos()]
 
 def is_blocked(username, other_username):
 	return get_user_by_username(username).is_blocked(get_user_by_username(other_username))
@@ -58,10 +58,10 @@ def is_following(username, other_username):
 	return get_user_by_username(username).is_following(get_user_by_username(other_username))
 
 def get_following(username):
-	return get_user_by_username(username).get_following()
+	return [following for following in get_user_by_username(username).get_following()]
 
 def get_followers(username):
-	return get_user_by_username(username).get_followers()
+	return [follower for follower in get_user_by_username(username).get_followers()]
 
 def get_video_views(username):
 	return get_user_by_username(username).get_video_views()
@@ -117,8 +117,7 @@ def remove_vote(url):
 	return get_video_by_url(url).vote(session, False)
 
 def get_comments(url):
-	comments = get_video_by_url(url).get_comments()
-	return comments
+	return [comment for comment in get_video_by_url(url).get_comments()]
 
 def get_video_by_url(url):
 	# url = "https://vid.me/Z47b"
