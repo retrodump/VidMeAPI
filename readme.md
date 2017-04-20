@@ -3,6 +3,8 @@
 
 This is an entry-level extracted API for VidMe. Please see `main.py` for many use-case examples.
 
+Now on pip! `pip install vidme`.
+
 GitHub IO Page: https://kingfredrickvi.github.io/VidMeAPI/
 
 ## Installation
