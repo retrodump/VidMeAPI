@@ -139,7 +139,7 @@ def upload_video_by_command():
 
 	upload_video(video_filename)
 
-def upload_video(video_filename, title = "My Super Epic 1337 Video"):
+def upload_video(video_filename, title = "My Super Epic 1337 Video", category_id=None):
 	if not session: 
 		print "User is not set!"
 		return
@@ -151,6 +151,9 @@ def upload_video(video_filename, title = "My Super Epic 1337 Video"):
 
 	# Upload our file and get if_successful
 	video_upload = video.upload(session, title, no_output=False)
+
+	if category_id:
+		video_upload.set_category(category_id)
 
 	if video_upload:
 		print "Video title:", video.get_title()

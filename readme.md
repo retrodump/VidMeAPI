@@ -219,6 +219,7 @@ Setters:
 * `flag(session, flag = 1)` - Flag the video. 1 to flag. 0 to unflag I guess.
 * `vote(session, vote = True, time = 0.0)` - `vote`: upvote if True, take away upvote if false, `time`: Time in the video at which you decided to upvote.
 * `delete(session)` - Deletes the video.
+* `set_channel(session, channel_id)` - Sets the channel/category for a video.
 
 ### Users
 
