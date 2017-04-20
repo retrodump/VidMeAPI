@@ -47,14 +47,18 @@ class User:
 				# Add getter for item
 				setattr(self, 'get_' + key, lambda v=value: v)
 
-	def _retrieve_albums(self):
+	def _retrieve_albums(self, limit=20, offset=0):
 		user_id = self._get_safe('user_id')
 
 		if user_id:
-			albums = api.request('/user/' + user_id + '/albums', method='GET')
+			albums = api.request('/user/' + user_id + '/albums', method='GET',
+				params=dict(
+					limit=limit,
+					offset=offset,
+				))
 
 			if albums:
-				self.albums = [
+				return [
 					Album(meta={'album': album}) for album in albums['albums']
 				]
 				return True
@@ -63,11 +67,24 @@ class User:
 		else:
 			return False
 
-	def get_albums(self):
+	def _yield_albums(self, limit, offset):
+		self.albums = []
+
+		while True:
+			albums = self._retrieve_albums(limit, offset)
+			if albums and len(albums) > 0:
+				self.albums.extend(albums)
+				offset += limit
+				yield albums
+			else:
+				break
+
+	def get_albums(self, refresh=False, limit=15, offset=0):
 		albums = self._get_safe('albums')
 
 		# If albums not found, try to retrieve them.
-		if not albums: self._retrieve_albums()
+		if refresh or not albums:
+			return self._yield_albums(limit, offset)
 
 		albums = self._get_safe('albums')
 
@@ -121,56 +138,102 @@ class User:
 	def unsubscribe_user(self, session, user):
 		return self._api_call(session, 'unsubscribe', dict(user=user.get_user_id()))
 
-	def get_followers(self, offset = 0, hard = False):
-		hasGotten = self._get_safe('followers')
+	def _retrieve_followers(self, limit=20, offset=0):
+		user_id = self._get_safe('user_id')
 
-		if hasGotten and not hard and offset == 0:
-			return hasGotten
-		else:
-			user_id = self._get_safe('user_id')
-
-			if user_id:
-				followers = api.request('/user/' + user_id + "/followers", method="GET", params=dict(
+		if user_id:
+			followers = api.request('/user/' + user_id + "/followers", method="GET", params=dict(
 					user=user_id,
-					offset=offset
+					offset=offset,
+					limit=limit,
 				))
 
-				if followers:
-					self.followers = [User(meta={'user': follower}) for follower in followers['users']]
-					return self.followers
-				else:
-					return False
+			if followers:
+				return [
+					User(meta={'user': follower}) for follower in followers['users']
+				]
 			else:
 				return False
-
-	def get_following(self, offset = 0, hard = False):
-		hasGotten = self._get_safe('followers')
-
-		if hasGotten and not hard and offset == 0:
-			return hasGotten
 		else:
-			user_id = self._get_safe('user_id')
+			return False
 
-			if user_id:
-				followers = api.request('/user/' + user_id + "/following", method="GET", params=dict(
+	def _yield_followers(self, limit, offset):
+		self.followers = []
+
+		while True:
+			followers = self._retrieve_followers(limit, offset)
+			if followers and len(followers) > 0:
+				self.followers.extend(followers)
+				offset += limit
+				yield followers
+			else:
+				break
+
+	def get_followers(self, refresh=False, limit=15, offset=0):
+		followers = self._get_safe('followers')
+
+		# If followers not found, try to retrieve them.
+		if refresh or not followers:
+			return self._yield_followers(limit, offset)
+
+		followers = self._get_safe('followers')
+
+		if followers:
+			return followers
+		else:
+			return False
+
+	def _retrieve_following(self, limit=20, offset=0):
+		user_id = self._get_safe('user_id')
+
+		if user_id:
+			following = api.request('/user/' + user_id + "/following", method="GET", params=dict(
 					user=user_id,
-					offset=offset
+					offset=offset,
+					limit=limit,
 				))
 
-				if followers:
-					self.followers = [User(meta={'user': follower}) for follower in followers['users']]
-					return self.followers
-				else:
-					return False
+			if following:
+				return [
+					User(meta={'user': following}) for following in following['users']
+				]
 			else:
 				return False
+		else:
+			return False
 
-	def is_following(self, other_username):
+	def _yield_following(self, limit, offset):
+		self.following = []
+
+		while True:
+			following = self._retrieve_following(limit, offset)
+			if following and len(following) > 0:
+				self.following.extend(following)
+				offset += limit
+				yield following
+			else:
+				break
+
+	def get_following(self, refresh=False, limit=15, offset=0):
+		following = self._get_safe('following')
+
+		# If following not found, try to retrieve them.
+		if refresh or not following:
+			return self._yield_following(limit, offset)
+
+		following = self._get_safe('following')
+
+		if following:
+			return following
+		else:
+			return False
+
+	def is_following(self, ouser):
 		user_id = self._get_safe('user_id')
 
 		if user_id:
 			request = api.request('/user/' + user_id + '/follow', method="GET", params=dict(
-				otherUser=other_username.get_user_id()
+				otherUser=ouser.get_user_id()
 			))
 
 			if request:
@@ -180,12 +243,12 @@ class User:
 		else:
 			return False
 
-	def is_blocked(self, other_username):
+	def is_blocked(self, ouser):
 		user_id = self._get_safe('user_id')
 
 		if user_id:
 			request = api.request(
-				'/user/' + user_id + '/block/' + other_username.get_user_id(),
+				'/user/' + user_id + '/block/' + ouser.get_user_id(),
 				method="GET"
 			)
 
@@ -196,20 +259,18 @@ class User:
 		else:
 			return False
 
-	def get_videos(self, session=None, order="video_id", limit=0, private=0, offset=0, hard=False):
-		hasGotten = self._get_safe('user_videos')
+	def _retrieve_videos(self, limit=20, offset=0, session=None, order=None, private=0):
+		from Video import Video
+		
+		user_id = self._get_safe('user_id')
 
-		if hasGotten and not hard and offset == 0:
-			return hasGotten
-		else:
-			user_id = self._get_safe('user_id')
+		token = None
 
-			if user_id:
-				token = None
-				if session:
-					token = session.get_token()
+		if session:
+			token = session.get_token()
 
-				videos = api.request('/videos/list', method="GET", params=dict(
+		if user_id:
+			videos = api.request('/videos/list', method="GET", params=dict(
 					private=private,
 					order=order,
 					token=token,
@@ -218,12 +279,36 @@ class User:
 					user=user_id
 				))
 
-				if videos:
-					from Video import Video
-
-					self.user_videos = [Video(meta={'video': video}) for video in videos['videos']]
-					return self.user_videos
-				else:
-					return False
+			if videos:
+				return [
+					Video(meta={'video': video}) for video in videos['videos']
+				]
 			else:
 				return False
+		else:
+			return False
+
+	def _yield_videos(self, limit, offset, session=None, order=None, private=0):
+		self.videos = []
+
+		while True:
+			videos = self._retrieve_videos(limit, offset, session, order, private)
+			if videos and len(videos) > 0:
+				self.videos.extend(videos)
+				offset += limit
+				yield videos
+			else:
+				break
+	def get_videos(self, refresh=False, limit=15, offset=0, session=None, order="video_id", private=0):
+		videos = self._get_safe('videos')
+
+		# If videos not found, try to retrieve them.
+		if refresh or not videos:
+			return self._yield_videos(limit, offset)
+
+		videos = self._get_safe('videos')
+
+		if videos:
+			return videos
+		else:
+			return False

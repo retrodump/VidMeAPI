@@ -77,7 +77,7 @@ class Video:
 		else:
 			return False
 
-	def _retrieve_comments(self, limit = 20, offset = 0, order = 'comment_id', direction = 'ASC'):
+	def _retrieve_comments(self, limit=20, offset=0, order='comment_id', direction='ASC'):
 		video_id = self._get_safe('video_id')
 
 		if video_id:
@@ -89,20 +89,32 @@ class Video:
 			), method='GET')
 
 			if comments:
-				self.comments = [
+				return [
 					Comment(comment) for comment in comments['comments']
 				]
-				return True
 			else:
 				return False
 		else:
 			return False
 
-	def get_comments(self, refresh=False, limit=20, offset=0):
+	def _yield_comments(self, limit, offset):
+		self.comments = []
+
+		while True:
+			coms = self._retrieve_comments(limit, offset)
+			if coms and len(coms) > 0:
+				self.comments.extend(coms)
+				offset += limit
+				yield coms
+			else:
+				break
+
+	def get_comments(self, refresh=False, limit=5, offset=0):
 		comments = self._get_safe('comments')
 
 		# If comments not found, try to retrieve them.
-		if refresh or not comments: self._retrieve_comments(limit, offset)
+		if refresh or not comments:
+			return self._yield_comments(limit, offset)
 
 		comments = self._get_safe('comments')
 
@@ -111,7 +123,7 @@ class Video:
 		else:
 			return False
 
-	def _retrieve_likes(self, limit=20, offset = 0, order = 'like_id', direction = 'ASC'):
+	def _retrieve_likes(self, limit=20, offset=0, order='like_id', direction='ASC'):
 		video_id = self._get_safe('video_id')
 
 		if video_id:
@@ -123,20 +135,32 @@ class Video:
 			), method='GET')
 
 			if likes:
-				self.likes = [
+				return [
 					Like(like) for like in likes['votes']
 				]
-				return True
 			else:
 				return False
 		else:
 			return False
 
-	def get_likes(self, refresh=False, limit=20, offset=0):
+	def _yield_likes(self, limit, offset):
+		self.likes = []
+
+		while True:
+			likes = self._retrieve_likes(limit, offset)
+			if likes and len(likes) > 0:
+				self.likes.extend(likes)
+				offset += limit
+				yield likes
+			else:
+				break
+
+	def get_likes(self, refresh=False, limit=15, offset=0):
 		likes = self._get_safe('likes')
 
 		# If likes not found, try to retrieve them.
-		if refresh or not likes: self._retrieve_likes(limit, offset)
+		if refresh or not likes:
+			return self._yield_likes(limit, offset)
 
 		likes = self._get_safe('likes')
 
