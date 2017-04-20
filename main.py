@@ -4,6 +4,7 @@ import sys
 import vidme
 import json
 import os.path
+import shlex
 
 session = None
 operations = {
@@ -13,7 +14,6 @@ operations = {
 }
 
 def main():
-	print get_likes_for_video('https://vid.me/gRWu')
 	settings = get_settings('settings')
 
 	global session
@@ -145,7 +145,7 @@ def upload_video(video_filename, title = "My Super Epic 1337 Video"):
 		print "User is not set!"
 		return
 
-	print "Uploading file:", video_filename
+	print "[+] Uploading file:", video_filename
 
 	# Create a new instance with the path to our file
 	video = vidme.Video(uri = video_filename)
@@ -154,7 +154,7 @@ def upload_video(video_filename, title = "My Super Epic 1337 Video"):
 	video_upload = video.upload(session, title, no_output=False)
 
 	if video_upload:
-		print video.get_title()
+		print "Video title:", video.get_title()
 	else:
 		print "[-] Failed to upload video."
 
@@ -183,7 +183,7 @@ def run_command(cmd, args):
 
 def start_commandline():
 	while True:
-		line = raw_input("Command: ").split()
+		line = shlex.split(raw_input("Command: "))
 		run_command(line[0], line[1:])
 
 def default_settings(filename):

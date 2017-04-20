@@ -20,8 +20,9 @@ class Video:
 		elif url or video_id or code:
 			self.set_meta(self.retrieve_meta())
 
-		# Upload in 2.5 MB chunks
-		self.chunk_size = 1024 * 2500
+		# Upload in 5.5 MB chunks
+		self.chunk_size = 1024 * 5500
+		self.has_started_upload = False
 
 	def retrieve_meta(self):
 		video = False
@@ -144,93 +145,112 @@ class Video:
 		else:
 			return False
 
-	def upload(self, session, title = "", no_output=False):
+	def upload(self, session, title = "", no_output=False, start_at=0, stop_at=None):
+		# Stop at not implemented yet.
+
 		if not self.uri:
 			print "[-] No uri given!"
 			return False
 		elif not session.get_token() and not session.new_token():
 			return False
 
-		if os.path.isfile(self.uri):
-			filename = os.path.basename(self.uri)
-			file_info = os.stat(self.uri)
-			file_size = file_info.st_size
+		if start_at:
+			self._index = start_at
 
-			if not title:
-				title = filename
+		if not self.has_started_upload:
+			self.has_started_upload = True
+			self._index = start_at
 
-			video_request = api.request('/video/request', data=dict(
-				filename=filename,
-				size=file_size,
-				title=title,
-				mode='chunked',
-				token=session.get_token()
-			))
+			if os.path.isfile(self.uri):
+				filename = os.path.basename(self.uri)
+				file_info = os.stat(self.uri)
+				self._file_size = file_info.st_size
 
-			if not video_request:
-				return False
+				if not title:
+					title = filename
 
-			code = video_request['code']
+				video_request = api.request('/video/request', data=dict(
+					filename=filename,
+					size=self._file_size,
+					title=title,
+					token=session.get_token()
+				))
 
-			if not no_output:
-				print "New Video Code:", code
+				if not video_request:
+					return False
 
-			upload = api.request('/upload/create', data=dict(
-				code=code,
-				size=file_size,
-				token=session.get_token()
-			))
-
-			if not no_output:
-				print upload
-
-			upload_id = upload['upload']['upload_id']
-
-			finished_video = {}
-
-			with open(self.uri, 'rb') as f:
-				chunk_request = True
+				self._code = video_request['code']
 
 				if not no_output:
-					print "[+] Video is uploading..."
+					print "[+] New Video Code:", self._code
 
-				chunk_request = api.request('/upload/chunk', params=dict(
-					code=code,
-					upload=upload_id,
+				upload = api.request('/upload/create', data=dict(
+					code=self._code,
+					size=self._file_size,
 					token=session.get_token()
-				), data=self._read_chunks(f, file_size, self.chunk_size))
+				))
 
-				if chunk_request:
-					finished_video = chunk_request['video']
+				self._upload_id = upload['upload']['upload_id']
 
-					if not no_output:
-						print "[+] Video is done uploading."
-				else:
-					if not no_output:
-						print "[-] File failed to upload."
+				return self._upload(session, no_output)
+			else:
+				print "[-] Could not find file", self.uri
+		else:
+			return self._upload(session, no_output)
 
-			if 'video_id' in finished_video:
-				self.url = None
-				self.video_id = finished_video['video_id']
-				self.set_meta(self.retrieve_meta())
+	def _upload(self, session, no_output=False):
+		finished_video = {}
 
+		with open(self.uri, 'rb') as f:
+			if self._index > 0:
+				# I guess this works? It need to be (self._index - 1)
+				# Maybe one day I'll test this.
+				f.seek(self._index)
+
+			if not no_output:
+				print "[+] Video is uploading..."
+
+			for chunk in self._read_chunks(f, self.chunk_size, no_output=no_output):
+				finished_video = api.request('/upload/chunk', params=dict(
+					code=self._code,
+					upload=self._upload_id,
+					token=session.get_token()
+				), extraheaders={
+					'Content-Length': str(len(chunk)),
+					'Content-Range': 'bytes %s-%s/%s' % (self._index, self._index + len(chunk) - 1, self._file_size),
+				},
+				data=chunk)
+
+				self._index += len(chunk)
+
+		if finished_video['upload']['state'] == 'completed':
+			self.url = None
+			self.set_meta(finished_video)
+
+			self.has_started_upload = False
 			return True
 		else:
-			print "[-] Could not find file", self.uri
+			if not no_output:
+				print "[-] Failed to finish upload."
+				
+			return False
 
-	def _read_chunks(self, file, file_size, size=1024000, chunk_count=-1):
+	def _read_chunks(self, file, size=1024000, chunk_count=-1, no_output=False):
 		count = 0.0
 
-		print "[*] Uploading in", size / 1000000.0, "MB sized chunks."
+		if not no_output:
+			print "[*] Uploading in", size / 1000000.0, "MB sized chunks."
 
-		while chunk_count:
+		while chunk_count < 0:
 			data = file.read(size)
 			count += len(data)
 			if not data:
 				break
 			yield data
 
-			print "[*] Upload at: " + str(math.ceil(count / file_size * 100)) + ("%.")
+			if not no_output:
+				print "[*] Upload at: " + str (round(count / self._file_size * 100.0, 2)) + "%."
+
 			chunk_count -= 1
 
 	def _api_call(self, session, action, args = {}):

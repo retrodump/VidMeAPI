@@ -1,6 +1,8 @@
 
 from requests import get, post, delete
 
+import socket
+
 import base64
 
 API_URL = "https://api.vid.me"
@@ -14,8 +16,6 @@ def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):
         headers.update(extraheaders)
     if token is not None:
         headers['AccessToken'] = token
- 
-    # print headers
 
     func = post
 
@@ -29,8 +29,6 @@ def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):
     result = func(API_URL + uri, headers=headers, **kwargs)
  
     result_json = result.json()
-    
-    # print "Making call at:", result.url
 
     if result.status_code >= 400:
         print "uri:", uri
