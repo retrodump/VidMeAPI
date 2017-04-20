@@ -29,9 +29,9 @@ Example:
 
 To upload a video, just do:
 
-```python main.py upload "c:/dir/dir/myvideo.mp4" "title"```
+```python main.py upload "c:/dir/dir/myvideo.mp4" "title" "C:/dir/dir/myThumbnail.jpg"```
 
-If you do not give it a title, the name of the video will be used.
+If you do not give it a title, the name of the video will be used. You also do not need to give it a thumbnail if you don't want to upload one. After thumbnail, you can give a category id, such as "270" (for Music).
 
 ## Commands
 
@@ -49,12 +49,14 @@ As a note: all commands need to start with: `python main.py`. So `python main.py
 
 Syntax:
 
-* `upload <path to video> [title]`
+* `upload <path to video> [title] [path to thumbnail] [channel_id/category_id]`
 
 Examples:
 
 * `upload C:\dir\dir\myvideo.mp4`
 * `upload C:\dir\dir\myvideo.mp4 "My cool title!"`
+* `upload C:\dir\dir\myvideo.mp4 "My cool title!" "C:\dir\dir\mythumbnail.jpg"`
+* `upload C:\dir\dir\myvideo.mp4 "My cool title!" "C:\dir\dir\mythumbnail.jpg" 270`
 
 ### Upload Folder
 
@@ -64,6 +66,10 @@ Examples:
 
 * `upload_folder C:\dir\dir\` (By default, targets MP4 files.)
 * `upload_folder C:\dir\dir\ *.avi`
+
+Automatically upload JPG/PNG thumbnails with the same name as video file.
+
+IE: `C:\dir\myvideo.mp4`, `C:\dir\myvideo.jpg`: myvideo.mp4 will upload and the myvideo.jpg will be uploaded and set as thumbnail.
 
 ## Usage
 

@@ -340,47 +340,41 @@ class Video:
 		return self._api_call(session, 'vote', dict(value=vote, time=time))
 
 	def set_thumbnail(self, session, thumb, no_output=False):
-		return False
-		#######
-		# Doesn't work lol
-		# Also tried using /video/:/thumbnail with no luck.
-		#######
+		video_id = self._get_safe('video_id')
 
-		# video_id = self._get_safe('video_id')
+		if video_id:
+			if os.path.isfile(thumb):
+				with open(thumb, 'rb') as f:
+					chunk_request = True
 
-		# if video_id:
-		# 	if os.path.isfile(thumb):
-		# 		with open(thumb, 'rb') as f:
-		# 			chunk_request = True
+					if not no_output:
+						print "[+] Thumbnail is uploading..."
 
-		# 			if not no_output:
-		# 				print "[+] Thumbnail is uploading..."
+					file_info = os.stat(thumb)
+					file_size = file_info.st_size
 
-		# 			file_info = os.stat(thumb)
-		# 			file_size = file_info.st_size
+					chunk_request = api.request('/video/' + video_id + '/edit',
+						params=dict(
+							token=session.get_token()
+						),
+						files=dict(
+							thumbnail=f
+						)
+					)
 
-		# 			chunk_request = api.request('/video/' + video_id + '/edit',
-		# 				params=dict(
-		# 					token=session.get_token()
-		# 				),
-		# 				data=dict(
-		# 					thumbnail=self._read_chunks(f, file_size, self.chunk_size)
-		# 				)
-		# 			)
+					print chunk_request
 
-		# 			print chunk_request
+					if not no_output:
+						print "[+] Thumbnail is done uploading."
 
-		# 			if not no_output:
-		# 				print "[+] Thumbnail is done uploading."
-
-		# 			if chunk_request:
-		# 				return True
-		# 			else:
-		# 				return False
-		# 	else:
-		# 		return False
-		# else:
-		# 	return False
+					if chunk_request:
+						return True
+					else:
+						return False
+			else:
+				return False
+		else:
+			return False
 
 	def get_uri(self):
 		return self.uri

@@ -139,7 +139,7 @@ def upload_video_by_command():
 
 	upload_video(video_filename)
 
-def upload_video(video_filename, title = "My Super Epic 1337 Video", category_id=None):
+def upload_video(video_filename, title = "My Super Epic 1337 Video", thumbnail=None, category_id=None):
 	if not session: 
 		print "User is not set!"
 		return
@@ -152,21 +152,45 @@ def upload_video(video_filename, title = "My Super Epic 1337 Video", category_id
 	# Upload our file and get if_successful
 	video_upload = video.upload(session, title, no_output=False)
 
+	if thumbnail:
+		video.set_thumbnail(session, thumbnail)
+
 	if category_id:
-		video_upload.set_category(category_id)
+		video.set_channel(session, category_id)
 
 	if video_upload:
 		print "Video title:", video.get_title()
 	else:
 		print "[-] Failed to upload video."
 
-def upload_folder(directory, regex = "*.mp4"):
+def upload_folder(directory, regex="*.mp4"):
 	import glob
 
-	[
-		vidme.Video(uri=video_uri).upload(session) 
+	directory = directory.replace('\\', '\\\\')
+
+	videos = [
+		vidme.Video(uri=video_uri)
 		for video_uri in glob.glob(directory + "/"+ regex)
 	]
+
+	print videos
+
+	for video in videos:
+		video.upload(session)
+
+		# Prepare for thumbnail
+		video_dir = os.path.dirname(video.get_uri())
+		video_name = os.path.splitext(os.path.basename(video.get_uri()))[0]
+
+		# Try to get jpg thumbnail.
+		# If no jpg, try png.
+		video_thumb1 = video_dir + "/" + video_name + ".jpg"
+		video_thumb2 = video_dir + "/" + video_name + ".png"
+
+		if os.path.isfile(video_thumb1):
+			video.set_thumbnail(video_thumb1)
+		elif os.path.isfile(video_thumb2):
+			video.set_thumbnail(video_thumb2)
 
 """
 
