@@ -1,8 +1,6 @@
 
 from requests import get, post, delete
-
 import socket
-
 import base64
 
 API_URL = "https://api.vid.me"
@@ -28,6 +26,8 @@ def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):
  
     result = func(API_URL + uri, headers=headers, **kwargs)
  
+    # print result.url
+
     result_json = result.json()
 
     if result.status_code >= 400:

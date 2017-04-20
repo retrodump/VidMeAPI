@@ -247,11 +247,12 @@ Getters:
 * `get_cover_url()`
 * `get_video_views()`
 * `get_likes_count()`
-* `is_following(other_username)` - `other_username`: user to follow. Is a class User.
-* `is_blocked(other_username)` - `other_username`: user to follow. Is a class User.
-* `get_videos(sort="recent", private=0, session=None, offset=0)`
-* `get_followers(offset = 0, hard = False)` - `offset`: offset of list, `hard`: use cached followers list or use list that has already been grabbed.
-* `get_following(offset = 0, hard = False)` - `offset`: offset of list, `hard`: use cached following list or use list that has already been grabbed.
+* `is_following(ouser)` - `ouser`: user to follow. Is a class User.
+* `is_blocked(ouser)` - `ouser`: user to follow. Is a class User.
+* `get_videos(refresh=False, limit=15, offset=0, session=None, order="video_id", private=0)` - `refresh`: Get fresh list of videos. `session` - If you want to list videos that are unlisted or private. `private` - Show private videos or not. If you haven't called it before, it returns a generator. Please see `get_comments` for more information.
+* `get_followers(refresh=False, limit=15, offset=0)` - `refresh`: Get fresh list of followers. If you haven't called it before, it returns a generator. Please see `get_comments` for more information.
+* `get_following(refresh=False, limit=15, offset=0)` - `refresh`: Get fresh list of following. If you haven't called it before, it returns a generator. Please see `get_comments` for more information.
+* `get_albums(refresh=False, limit=15, offset=0)` - `refresh`: Get fresh list of albums. If you haven't called it before, it returns a generator. Please see `get_comments` for more information.
 
 Sort Values:
 
@@ -281,10 +282,21 @@ video = vidme.Video(video_id = 14854593)
 comments = video.get_comments()
 ```
 
-The limit is 20 by default. To increase the number, just pass as parameter.
+It is important to note that the first time you retrieve get_comments, it will
+return a generator. This means that every time you access it, it returns the
+next `limit` of comments. This is so you don't have to make a bunch of API
+calls all at once if you don't have to. To get all comments, do the following:
 
 ```
-likes = video.get_comments(limit=50)
+comments = [comment for comment in video.get_comments()]
+```
+
+Once you run through get_comments once, it will return the complete list
+of comments without having to make any calls to the API. So from that point on,
+you can just do:
+
+```
+comments = video.get_comments()
 ```
 
 Getters:
