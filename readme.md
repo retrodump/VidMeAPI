@@ -173,7 +173,7 @@ Using a getter:
 print video.get_title()
 ```
 
-Gettings:
+Getters:
 
 * `get_video_id()`
 * `get_likes()`
