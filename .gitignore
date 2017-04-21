@@ -1,3 +1,5 @@
 
 settings.json
 *.pyc
+MANIFEST
+dist/

@@ -13,4 +13,4 @@ setup(
   classifiers = [],
 )
 
-# setuppy sdist upload -r pypi
+# setup.py sdist upload -r pypi
