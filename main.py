@@ -19,10 +19,6 @@ operations = {
 def main():
 	settings = get_settings('settings')
 
-	download_video_by_command('album', '240p', 90822, '.')
-
-	return True
-
 	global session
 	session = vidme.Session(settings, no_output=True)
 
@@ -141,7 +137,11 @@ def get_video_by_code(code):
 def download_video_by_command(dtype, form, video, uri, **kwargs):
 	if dtype.lower() == 'video':
 		try:
-			download_video(form, video, uri, **kwargs)
+			# Get code
+			if video.endswith('/'):
+				video = video[:-1]
+			video = video.split('/')[-1]
+			download_video(form, vidme.Video(code=video), uri, **kwargs)
 		except Exception as e:
 			print '[-] ERROR:', e
 	elif dtype.lower() == 'album':
