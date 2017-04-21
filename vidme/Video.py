@@ -56,6 +56,15 @@ class Video:
 					setattr(self, 'user', value)
 					# Add getter for item
 					setattr(self, 'get_' + 'user', lambda v=value: v)
+				elif key == 'formats':
+					tv = {}
+					for form in value:
+						tv[form['type']] = form
+
+					# Add item to class
+					setattr(self, key, value)
+					# Add getter for item
+					setattr(self, 'get_' + key, lambda v=tv: v)
 				else:
 					# Add item to class
 					setattr(self, key, value)

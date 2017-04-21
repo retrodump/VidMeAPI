@@ -5,16 +5,23 @@ import vidme
 import json
 import os.path
 import shlex
+import urllib2
+import time
 
 session = None
 operations = {
 	'upload': 'upload_video',
 	'comments': 'get_comments',
 	'upload_folder': 'upload_folder',
+	'download': 'download_video_by_command',
 }
 
 def main():
 	settings = get_settings('settings')
+
+	download_video_by_command('album', '240p', 90822, '.')
+
+	return True
 
 	global session
 	session = vidme.Session(settings, no_output=True)
@@ -130,6 +137,130 @@ def get_video_by_video_id(video_id):
 def get_video_by_code(code):
 	# code = "Z47b"
 	return vidme.Video(code = code)
+
+def download_video_by_command(dtype, form, video, uri, **kwargs):
+	if dtype.lower() == 'video':
+		try:
+			download_video(form, video, uri, **kwargs)
+		except Exception as e:
+			print '[-] ERROR:', e
+	elif dtype.lower() == 'album':
+		# album_id - 90822
+		album = vidme.Album(90822)
+
+		for video_chunk in album.get_videos():
+			for video_to_download in video_chunk:
+				try:
+					download_video(form, video_to_download, uri, **kwargs)
+				except Exception as e:
+					print '[-] ERROR:', e
+
+# download 480p 0ex2 .
+def download_video(form, video, uri, **kwargs):
+	def _to_ascii(title):
+		return ''.join([i if ord(i) < 128 else '-' for i in title])
+
+	# Convert title to ascii.
+	video.title = _to_ascii(video.get_title())
+
+	# Get our URI path without extension.
+	final_path = uri + '/' + video.get_title()
+
+	if '--no-overwrites' in kwargs or '-w' in kwargs:
+		if os.path.isfile(final_path + ".mp4"):
+			print "[-] File exists. Not downloading."
+			return False
+
+	if uri.endswith('/') or uri.endswith('\\'):
+		code_or_url = code_or_url[:-1]
+
+	code = video.get_url()
+
+	if not video._get_safe('formats'):
+		video = vidme.Video(video.get_full_url())
+
+	forms = video.get_formats()
+
+	if form not in forms:
+		print "[-] Format not found! ", form
+		return False
+	else:
+		print "[*] Downloading video:", video.get_title()
+
+		def _download_file(url, size=1024 * 2500, chunk_count=-1, no_output=False):
+			count = 0.0
+			start_time = time.time()
+
+			try:
+				file_size = float(url.info().getheaders('Content-Length')[0])
+			except:
+				file_size = 1.0
+
+			if not no_output:
+				print "[*] Dowloading in", size / 1000000.0, "MB sized chunks."
+
+			while chunk_count < 0:
+				data = url.read(size)
+				count += len(data)
+				if not data:
+					break
+
+				yield data
+
+				if not no_output:
+					per_left = count / file_size * 100.0
+
+					out = "[*] Download at: {0:6.2f}%.".format(per_left)
+
+					# Output and go up one line. This is so it auto updates.
+					sys.stdout.write(out + "\r")
+
+				chunk_count -= 1
+
+			if not no_output:
+				print "[*] Download at: {0:6.2f}%. Took: {1:7.2f} seconds.".format(
+					100.0, time.time() - start_time
+				)
+
+		url = forms[form]['uri']
+		success = False
+
+		try:
+			video_url = urllib2.urlopen(url)
+
+			# Open our local file for writing
+			with open(final_path + ".mp4", "wb") as f:
+				for c in _download_file(video_url):
+					f.write(c)
+
+			success = True
+		except urllib2.HTTPError, e:
+			print "HTTP Error:", e.code, url
+		except urllib2.URLError, e:
+			print "URL Error:", e.reason, url
+
+		print "[*] Finished downloading."
+
+		if success:
+			if '--write-description' in kwargs:
+				with open(final_path + ".description", "wb") as f:
+					f.write(video.get_description())
+			if '--write-comments' in kwargs:
+				with open(final_path + ".comments", "wb") as f:
+					f.write('\r\n'.join([
+							"User: {1}\r\n\r\n{2}\r\n\r\n".format(c.get_username(), c.get_body())
+							for c in video.get_comments()
+						]))
+			if '--write-thumbnail' in kwargs:
+				with open(final_path + ".jpg", "wb") as f:
+					thumbnail_url = urllib2.urlopen(video.get_thumbnail_url())
+					for c in _download_file(thumbnail_url):
+						f.write(c)
+			if '--info-json' in kwargs:
+				with open(final_path + '.info.json', "wb") as f:
+					f.write(video.meta)
+
+		return True
 
 def upload_video_by_command():
 	video_filename = "C:/somedir/another/myvideo.mp4"

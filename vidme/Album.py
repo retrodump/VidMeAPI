@@ -34,6 +34,61 @@ class Album:
 				# Add getter for item
 				setattr(self, 'get_' + key, lambda v=value: v)
 
+	def _retrieve_videos(self, limit=20, offset=0, session=None, order=None, private=0):
+		from Video import Video
+		
+		album_id = self._get_safe('album_id')
+
+		token = None
+
+		if session:
+			token = session.get_token()
+
+		if album_id:
+			videos = api.request('/album/' + album_id + '/videos', method="GET", params=dict(
+					private=private,
+					order=order,
+					token=token,
+					offset=offset,
+					limit=limit,
+					album=album_id
+				))
+
+			if videos:
+				return [
+					Video(meta={'video': video}) for video in videos['videos']
+				]
+			else:
+				return False
+		else:
+			return False
+
+	def _yield_videos(self, limit, offset, session=None, order=None, private=0):
+		self.videos = []
+
+		while True:
+			videos = self._retrieve_videos(limit, offset, session, order, private)
+			if videos and len(videos) > 0:
+				self.videos.extend(videos)
+				offset += limit
+				yield videos
+			else:
+				break
+
+	def get_videos(self, refresh=False, limit=15, offset=0, session=None, order="video_id", private=0):
+		videos = self._get_safe('videos')
+
+		# If videos not found, try to retrieve them.
+		if refresh or not videos:
+			return self._yield_videos(limit, offset)
+
+		videos = self._get_safe('videos')
+
+		if videos:
+			return videos
+		else:
+			return False
+
 	def _get_safe(self, name):
 		if hasattr(self, name):
 			return getattr(self, name)
