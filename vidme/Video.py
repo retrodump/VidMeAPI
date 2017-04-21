@@ -3,6 +3,8 @@ import os
 import os.path
 import api
 import math
+import time
+import sys
 from Comment import Comment
 from User import User
 from Like import Like
@@ -261,6 +263,7 @@ class Video:
 
 	def _read_chunks(self, file, size=1024000, chunk_count=-1, no_output=False):
 		count = 0.0
+		start_time = time.time()
 
 		if not no_output:
 			print "[*] Uploading in", size / 1000000.0, "MB sized chunks."
@@ -270,12 +273,32 @@ class Video:
 			count += len(data)
 			if not data:
 				break
+
+			if not no_output:
+				time_before = time.time()
 			yield data
 
 			if not no_output:
-				print "[*] Upload at: " + str (round(count / self._file_size * 100.0, 2)) + "%."
+				chunks_left = (self._file_size / float(size)) + chunk_count
+				time_calc = (time.time() - time_before) * chunks_left
+				if time_calc < 0.0:
+					time_calc = 0.0
+
+				per_left = count / self._file_size * 100.0
+
+				out = "[*] Upload at: {0:6.2f}%. {1:7.2f} seconds left.".format(
+					per_left, time_calc
+				)
+
+				# Output and go up one line. This is so it auto updates.
+				sys.stdout.write(out + "\r")
 
 			chunk_count -= 1
+
+		if not no_output:
+			print "[*] Upload at: {0:6.2f}%. Took: {1:7.2f} seconds.".format(
+				100.0, time.time() - start_time
+			)
 
 	def _api_call(self, session, action, args = {}):
 		video_id = self._get_safe('video_id')
