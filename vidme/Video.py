@@ -105,13 +105,17 @@ class Video:
 			coms = self._retrieve_comments(limit, offset)
 			total = 0
 
-			for com in coms:
-				total = com[1]
-				self.comments.append(com[0])
-				offset += 1
-				yield com[0]
+			if com:
+				for com in coms:
+					total = com[1]
+					self.comments.append(com[0])
+					yield com[0]
 
-			if not coms or offset >= total:
+				if offset >= total:
+					break
+
+				offset += limit
+			else:
 				break
 
 	def get_comments(self, refresh=False, limit=15, offset=0):
@@ -140,26 +144,27 @@ class Video:
 			), method='GET')
 
 			if likes:
-				return [
-					Like(like) for like in likes['votes']
-				]
-			else:
-				return False
-		else:
-			return False
+				for like in likes['votes']:
+					yield (Like(like), likes['page']['total'])
 
 	def _yield_likes(self, limit, offset):
 		self.likes = []
 
 		while True:
 			likes = self._retrieve_likes(limit, offset)
-			if likes and len(likes) > 0:
-				self.likes.extend(likes)
-				offset += limit
-				yield likes
 
-				if len(likes) < limit:
+			if likes:
+				total = 0
+
+				for like in likes:
+					total = like[1]
+					self.likes.append(like[0])
+					yield like
+
+				if offset >= total:
 					break
+
+				offset += limit
 			else:
 				break
 
