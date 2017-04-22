@@ -251,7 +251,6 @@ Examples:
 * `download video 480p https://vid.me/qhIM C:\dir\dir\`
 * `download video 480p qhIM C:\dir\dir\`
 * `download video 480p vid.me/qhIM C:\dir\dir\`
-* `download video 480p vid.me/qhIM C:\dir\dir\`
 
 * `download video 480p vid.me/qhIM C:\dir\dir\ --write-comments --write-description`
 * `download video 480p vid.me/qhIM C:\dir\dir\ -w`
@@ -259,7 +258,6 @@ Examples:
 
 * `download album 480p 90822 C:\dir\dir\`
 
-* `download user 480p kingfredrickvi C:\dir\dir\`
 * `download user 480p KingFredrickVI C:\dir\dir\`
 * `download user 480p vid.me/kingfredrickVI C:\dir\dir\ -w`
 * `download user 480p https://vid.me/kingfredrickvi C:\dir\dir\ --write-info-json`
