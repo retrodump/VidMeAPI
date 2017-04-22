@@ -17,6 +17,15 @@ class User:
 		else:
 			self.user_id = ""
 
+		if "url" in kwargs:
+			uname = kwargs['url']
+
+			if uname.endswith('/'):
+				uname = uname[:-1]
+			uname = uname.split('/')[-1]
+
+			self.username = uname
+
 		if 'meta' in kwargs:
 			self.set_meta(kwargs['meta'])
 		elif self.user_id or self.username:
