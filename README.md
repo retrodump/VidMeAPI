@@ -79,13 +79,13 @@ the title of the video. In the future I will add an option to name video.
 
 Syntax:
 
-* `download <link type> <format> <video url | album id> <path to folder to download video(s) to> [args...]
+* `download <link type> <format> <video url | video code | username | user url | album id> <path to folder to download video(s) to> [args...]
 
 Arguments:
 
-* `link type`: ['video', 'album']
+* `link type`: ['video', 'user, 'album']
 * `format`: ['480p', '240p', '720p', '1080p']
-* `video url | album url`: ['https://vid.me/qhIM' or 'qhIM', 90822]
+* `video url | video code | username | user url | album id`: ['https://vid.me/qhIM', 'qhIM', 'KingFredrickVI', 'https://vid.me/KingFredrickVI', 90822]
 
 *Note: (90822 is an id of a album)*
 
@@ -110,6 +110,11 @@ Examples:
 * `download video 480p vid.me/qhIM C:\dir\dir\ --info-json`
 
 * `download album 480p 90822 C:\dir\dir\`
+
+* `download user 480p kingfredrickvi C:\dir\dir\`
+* `download user 480p KingFredrickVI C:\dir\dir\`
+* `download user 480p vid.me/kingfredrickVI C:\dir\dir\ -w`
+* `download user 480p https://vid.me/kingfredrickvi C:\dir\dir\ --info-json`
 
 ## Usage
 
