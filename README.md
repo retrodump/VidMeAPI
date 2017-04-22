@@ -33,6 +33,23 @@ To upload a video, just do:
 
 If you do not give it a title, the name of the video will be used. You also do not need to give it a thumbnail if you don't want to upload one. After thumbnail, you can give a category id, such as "270" (for Music).
 
+## Downlaod
+
+To download a video, you can do one of three things:
+
+```python main.py download video 480p https://vid.me/WP35 "c:/dir/dir/"```
+```python main.py download album 480p 90822 "c:/dir/dir/"```
+```python main.py download user 480p https://vid.me/DidYouKnowGaming "c:/dir/dir/"```
+
+Generally, the following formats work:
+
+* `240p`
+* `480p`
+* `720p`
+* `1080p`
+
+(The only way to get an album is by its ID. It's a limitation on the API).
+
 ## Commands
 
 `<string>` means it's required. `[string]` means it's optional to have. If the argument you are passing has a space in it, you need to wrap it in quotes.
@@ -79,7 +96,7 @@ the title of the video. In the future I will add an option to name video.
 
 Syntax:
 
-* `download <link type> <format> <video url | video code | username | user url | album id> <path to folder to download video(s) to> [args...]
+* `download <link type> <format> <video url | video code | username | user url | album id> <path to folder to download video(s) to> [args...]`
 
 Arguments:
 
