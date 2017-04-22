@@ -22,8 +22,57 @@ In order to set up your account, just copy and paste 'settings.json.example' to 
 Example:
 
 ```
+Settings.json:
+
 {"username": "AwesomeFred", "password": "chivermetimbers"}
 ```
+
+## OAuth
+
+Right now there is basic OAuth support.
+
+```
+Settings.json:
+
+{
+	"username": "asdf",
+	"password": "asdf",
+
+	"oauth": {
+		"client_id": "asdfasdf",
+		"key": "asdfasdf",
+		"secret": "asdfasdf",
+		"redirect_uri": "http://localhost:5010",
+		"scope": ["auth_management", "videos", "account", "etc"]
+	},
+
+	"code": "asdfasdf-optional",
+	"token": "asdfasdf-optional"
+}
+```
+
+When you try to authenticate a user via oauth, this application will open a new window to vidme and wait for the user to click 'authorize account'. Once it does, vidme will redirect to localhost:5010 (this application) and this application will grab the authorization code. If you would like to skip this process because you are doing it your own way, just pass in the parameter 'code' on creation of the session with the code and it will not run through that whole process.
+
+Token is returned both when you sign in through username/password and code. Save it in the field token if you do not want to store username/password or oauth stuff.
+
+From here you're golden! You just pass session around the same if it's username/password or OAuth. Just remember that for each account, you need a new 'session' instance.
+
+### Setup
+
+Go to:
+
+https://vid.me/oauth/client/create
+
+Create a new application. The only thing that is important is 'Redirect URI Prefix'. Set this
+to 'http://localhost:5010' if you would like to use the built-in auto OAuth token fetching.
+
+Once it has been created, you will see it in your list of OAuth clients found here:
+
+https://vid.me/oauth/clients
+
+In your settings.json, paste in your client_id, key, and secret. If you are only doing read-only operations, you can leave your secret key as "".
+
+Scope is what your program can mess with on that users account. Please browse https://docs.vid.me/ to find out different permissions what what calls need what permissions. Look for the 'Permission: blah' sentence.
 
 ## Upload
 
