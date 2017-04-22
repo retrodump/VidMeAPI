@@ -54,6 +54,8 @@ Generally, the following formats work:
 
 ## Commands
 
+(If you just run `python main.py`, it wills start a command terminal)
+
 `<string>` means it's required. `[string]` means it's optional to have. If the argument you are passing has a space in it, you need to wrap it in quotes.
 
 Example: 
