@@ -154,6 +154,20 @@ def download_video_by_command(dtype, form, video, uri, **kwargs):
 					download_video(form, video_to_download, uri, **kwargs)
 				except Exception as e:
 					print '[-] ERROR:', e
+	elif dtype.lower() == 'user':
+		# Get username
+		if video.endswith('/'):
+			video = video[:-1]
+		video = video.split('/')[-1]
+
+		user = vidme.User(video)
+
+		for video_chunk in user.get_videos():
+			for video_to_download in video_chunk:
+				try:
+					download_video(form, video_to_download, uri, **kwargs)
+				except Exception as e:
+					print '[-] ERROR:', e
 
 # download 480p 0ex2 .
 def download_video(form, video, uri, **kwargs):
