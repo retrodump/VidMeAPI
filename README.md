@@ -104,7 +104,7 @@ One last thing: Do not use the built-in OAuth token fetching feature on producti
 
 ### Examples
 
-Example 1:
+#### Example 1
 
 ```
 settings = {
@@ -123,7 +123,7 @@ video = vidme.Video(uri="C:\dir\dir\supervideo.mp4")
 video.upload(session, "Cool title!")
 ```
 
-Example 2:
+#### Example 2
 
 ```
 settings = {
@@ -136,7 +136,7 @@ video = vidme.Video(uri="C:\dir\dir\supervideo.mp4")
 video.upload(session, "Cool title!")
 ```
 
-Example 3:
+#### Example 3:
 
 ```
 settings = {
