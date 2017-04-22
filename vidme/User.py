@@ -161,25 +161,26 @@ class User:
 				))
 
 			if followers:
-				return [
-					User(meta={'user': follower}) for follower in followers['users']
-				]
-			else:
-				return False
-		else:
-			return False
+				for follower in followers['users']:
+					yield (User(meta={'user': follower}), followers['page']['total'])
 
 	def _yield_followers(self, limit, offset):
 		self.followers = []
 
 		while True:
 			followers = self._retrieve_followers(limit, offset)
-			if followers and len(followers) > 0:
-				self.followers.extend(followers)
-				offset += limit
-				yield followers
 
-				if len(followers) < limit:
+			if followers:
+				total = 0
+
+				for follower in followers:
+					self.followers.append(follower[0])
+					total = follower[1]
+					yield follower[0]
+
+				offset += limit
+				
+				if offset >= total:
 					break
 			else:
 				break
