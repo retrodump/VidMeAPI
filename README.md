@@ -100,6 +100,8 @@ In your settings.json, paste in your client_id, key, and secret. If you are only
 
 Scope is what your program can mess with on that users account. Please browse https://docs.vid.me/ to find out different permissions what what calls need what permissions. Look for the 'Permission: blah' sentence.
 
+One last thing: Do not use the built-in OAuth token fetching feature on production lol. Please use HTTPS and a more fancy mechanism. It's there so you can do OAuth testing or local scripts, etc.
+
 ### Example
 
 ```
