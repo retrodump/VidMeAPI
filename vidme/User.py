@@ -293,25 +293,26 @@ class User:
 				))
 
 			if videos:
-				return [
-					Video(meta={'video': video}) for video in videos['videos']
-				]
-			else:
-				return False
-		else:
-			return False
+				for video in videos['videos']:
+					yield (Video(meta={'video': video}), videos['page']['total']) 
 
 	def _yield_videos(self, limit, offset, session=None, order=None, private=0):
 		self.videos = []
 
 		while True:
 			videos = self._retrieve_videos(limit, offset, session, order, private)
-			if videos and len(videos) > 0:
-				self.videos.extend(videos)
-				offset += limit
-				yield videos
 
-				if len(videos) < limit:
+			if videos:
+				total = 0
+
+				for video in videos:
+					self.videos.append(video[0])
+					total = video[1]
+					yield videos
+
+				offset += limit
+				
+				if offset >= total:
 					break
 			else:
 				break
