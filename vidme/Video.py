@@ -110,11 +110,11 @@ class Video:
 					total = com[1]
 					self.comments.append(com[0])
 					yield com[0]
+					
+				offset += limit
 
 				if offset >= total:
 					break
-
-				offset += limit
 			else:
 				break
 
@@ -161,10 +161,10 @@ class Video:
 					self.likes.append(like[0])
 					yield like
 
+				offset += limit
+
 				if offset >= total:
 					break
-
-				offset += limit
 			else:
 				break
 
