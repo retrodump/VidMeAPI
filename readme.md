@@ -71,6 +71,46 @@ Automatically upload JPG/PNG thumbnails with the same name as video file.
 
 IE: `C:\dir\myvideo.mp4`, `C:\dir\myvideo.jpg`: myvideo.mp4 will upload and the myvideo.jpg will be uploaded and set as thumbnail.
 
+### Download
+
+Accepts an album id or a video url / video code. If you give an album id, it will
+download all videos in that album. The name of the video that is saved will be
+the title of the video. In the future I will add an option to name video.
+
+Syntax:
+
+* `download <link type> <format> <video url | album id> <path to folder to download video(s) to> [args...]
+
+Arguments:
+
+* `link type`: ['video', 'album']
+* `format`: ['480p', '240p', '720p', '1080p']
+* `video url | album url`: ['https://vid.me/qhIM' or 'qhIM', 90822]
+
+*Note: (90822 is an id of a album)*
+
+Flags:
+
+* `--no-overwrites` - If file exists, skip downloading.
+* `-w` - If file exists, skip downloading.
+* `--write-description` - Writes the description of the video to 'title.description'.
+* `--write-comments` - Writes the top-level comments to 'title.comments'. In the future, I need to make this write JSON instead of a custom format. Just dump the comment meta with a key of comment_id.
+* `--write-thumbnail` - Writes the thumbnail of the video to 'title.jpg'.
+* `--info-json` - Writes the video's meta to 'title.info.json'.
+
+Examples:
+
+* `download video 480p https://vid.me/qhIM C:\dir\dir\`
+* `download video 480p qhIM C:\dir\dir\`
+* `download video 480p vid.me/qhIM C:\dir\dir\`
+* `download video 480p vid.me/qhIM C:\dir\dir\`
+
+* `download video 480p vid.me/qhIM C:\dir\dir\ --write-comments --write-description`
+* `download video 480p vid.me/qhIM C:\dir\dir\ -w`
+* `download video 480p vid.me/qhIM C:\dir\dir\ --info-json`
+
+* `download album 480p 90822 C:\dir\dir\`
+
 ## Usage
 
 ### General Functions
