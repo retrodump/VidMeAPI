@@ -53,6 +53,28 @@ Settings.json:
 
 When you try to authenticate a user via oauth, this application will open a new window to vidme and wait for the user to click 'authorize account'. Once it does, vidme will redirect to localhost:5010 (this application) and this application will grab the authorization code. If you would like to skip this process because you are doing it your own way, just pass in the parameter 'code' on creation of the session with the code and it will not run through that whole process.
 
+If you would like to get the code yourself, check out this example link:
+
+```
+'https://vid.me/oauth/authorize?' + \
+	'scope=' + self.scope + '&' + \
+	'client_id=' + self.client_id + '&' + \
+	'response_type=code&' + \
+	'redirect_uri=' + self.redirect_uri + '&' + \
+	'authorization=allow'
+```
+
+```
+https://vid.me/oauth/authorize?
+	scope=auth_management,videos,account&
+	client_id=asdfasdf&
+	response_type=code&
+	redirect_uri=http://localhost:5010&
+	authorization=allow
+```
+
+This will return the URL: http://localhost:5010/?code=sdoijfaoisjefoisjdfdsf
+
 Token is returned both when you sign in through username/password and code. Save it in the field token if you do not want to store username/password or oauth stuff.
 
 From here you're golden! You just pass session around the same if it's username/password or OAuth. Just remember that for each account, you need a new 'session' instance.
