@@ -37,9 +37,11 @@ If you do not give it a title, the name of the video will be used. You also do n
 
 To download a video, you can do one of three things:
 
-```python main.py download video 480p https://vid.me/WP35 "c:/dir/dir/"```
-```python main.py download album 480p 90822 "c:/dir/dir/"```
-```python main.py download user 480p https://vid.me/DidYouKnowGaming "c:/dir/dir/"```
+```
+python main.py download video 480p https://vid.me/WP35 "c:/dir/dir/"
+python main.py download album 480p 90822 "c:/dir/dir/"
+python main.py download user 480p https://vid.me/DidYouKnowGaming "c:/dir/dir/"
+```
 
 Generally, the following formats work:
 
