@@ -15,7 +15,8 @@ def do_request(uri, session=None, method='POST', extraheaders=None, **kwargs):
     if session is not None:
         if session.get_token():
             headers['AccessToken'] = session.get_token()
-        elif session.get_oauth():
+
+        if session.get_oauth():
             headers['Authorization'] = session.get_oauth()
 
     func = post

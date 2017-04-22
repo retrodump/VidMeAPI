@@ -56,7 +56,7 @@ class Session:
 			self.password = None
 
 		if 'code' in settings:
-			self.get_oauth_token(settings['code'])
+			self.run_oauth(settings['code'])
 
 		if self.oauth:
 			pass
@@ -91,50 +91,52 @@ class Session:
 	def get_oauth(self):
 		return "Basic " + base64.b64encode(self.key + ":" + self.secret)
 
-	def run_oauth(self):
-		link = 'https://vid.me/oauth/authorize?' + \
-			'scope=' + self.scope + '&' + \
-			'client_id=' + self.client_id + '&' + \
-			'response_type=code&' + \
-			'redirect_uri=' + self.redirect_uri + '&' + \
-			'authorization=allow'
+	def run_oauth(self, code=None):
+		if not code:
+			link = 'https://vid.me/oauth/authorize?' + \
+				'scope=' + self.scope + '&' + \
+				'client_id=' + self.client_id + '&' + \
+				'response_type=code&' + \
+				'redirect_uri=' + self.redirect_uri + '&' + \
+				'authorization=allow'
 
-		print "[!] Please visit the following URL:"
-		print ""
-		print link
-		 
-		HOST = ''   # Symbolic name, meaning all available interfaces
-		PORT = 5010 # Arbitrary non-privileged port
-		 
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			print "[!] Please visit the following URL:"
+			print ""
+			print link
+			print ""
+			 
+			HOST = ''   # Symbolic name, meaning all available interfaces
+			PORT = 5010 # Arbitrary non-privileged port
+			 
+			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-		#Bind socket to local host and port
-		try:
-		    s.bind((HOST, PORT))
-		except socket.error as msg:
-		    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-		    sys.exit()
+			#Bind socket to local host and port
+			try:
+			    s.bind((HOST, PORT))
+			except socket.error as msg:
+			    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+			    sys.exit()
 
-		#Start listening on socket
-		s.listen(1)
+			#Start listening on socket
+			s.listen(1)
 
-		webbrowser.open_new(link)
+			webbrowser.open_new(link)
 
-		#wait to accept a connection - blocking call
-		conn, addr = s.accept()
+			#wait to accept a connection - blocking call
+			conn, addr = s.accept()
 
-		code = conn.recv(4096).splitlines()[0].split()[1].split('code=')[1]
+			code = conn.recv(4096).splitlines()[0].split()[1].split('code=')[1]
 
-		send_back_packet = """HTTP/1.0 200 OK
+			send_back_packet = """HTTP/1.0 200 OK
 Content-Type: text/html
 
 Thank you! You are good to go!
 """
 
-		conn.sendall(send_back_packet)
-		conn.close()
+			conn.sendall(send_back_packet)
+			conn.close()
 
-		s.close()
+			s.close()
 
 		self.oauthing = True
 

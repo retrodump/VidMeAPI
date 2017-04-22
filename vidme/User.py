@@ -56,11 +56,11 @@ class User:
 				# Add getter for item
 				setattr(self, 'get_' + key, lambda k=key: self._get_safe(k))
 
-	def _retrieve_albums(self, limit=20, offset=0):
+	def _retrieve_albums(self, limit=20, offset=0, session=None):
 		user_id = self._get_safe('user_id')
 
 		if user_id:
-			albums = api.request('/user/' + user_id + '/albums', method='GET',
+			albums = api.request('/user/' + user_id + '/albums', session, method='GET',
 				params=dict(
 					limit=limit,
 					offset=offset,
@@ -70,11 +70,11 @@ class User:
 				for album in albums['albums']:
 					yield (Album(meta={'album': album}), albums['page']['total'])
 
-	def _yield_albums(self, limit, offset):
+	def _yield_albums(self, limit, offset, session=None):
 		self.albums = []
 
 		while True:
-			albums = self._retrieve_albums(limit, offset)
+			albums = self._retrieve_albums(limit, offset, session)
 
 			if albums:
 				total = 0
@@ -92,12 +92,12 @@ class User:
 			else:
 				break
 
-	def get_albums(self, refresh=False, limit=15, offset=0):
+	def get_albums(self, refresh=False, limit=15, offset=0, session=None):
 		albums = self._get_safe('albums')
 
 		# If albums not found, try to retrieve them.
 		if refresh or not albums:
-			return self._yield_albums(limit, offset)
+			return self._yield_albums(limit, offset, session)
 
 		albums = self._get_safe('albums')
 

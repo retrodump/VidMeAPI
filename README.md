@@ -74,6 +74,25 @@ In your settings.json, paste in your client_id, key, and secret. If you are only
 
 Scope is what your program can mess with on that users account. Please browse https://docs.vid.me/ to find out different permissions what what calls need what permissions. Look for the 'Permission: blah' sentence.
 
+### Example
+
+```
+settings = {
+	"oauth": {
+		"client_id": "asedfasdfasdf",
+		"key": "asdfasdfasdf",
+		"secret": "afefasdfasdf",
+		"redirect_uri": "http://localhost:5010",
+		"scope": ["video_upload"]
+	}
+}
+
+session = vidme.Session(settings, no_output=True)
+
+video = vidme.Video(uri="C:\dir\dir\supervideo.mp4")
+video.upload(session, "Cool title!")
+```
+
 ## Upload
 
 To upload a video, just do:
