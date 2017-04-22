@@ -90,7 +90,7 @@ Go to:
 https://vid.me/oauth/client/create
 
 Create a new application. The only thing that is important is 'Redirect URI Prefix'. Set this
-to 'http://localhost:5010' if you would like to use the built-in auto OAuth token fetching.
+to 'http://localhost:5010' if you would like to use the built-in auto OAuth token fetching. The rest can be what ever you want. It won't really effect anything.
 
 Once it has been created, you will see it in your list of OAuth clients found here:
 
