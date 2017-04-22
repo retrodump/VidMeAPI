@@ -190,7 +190,7 @@ Syntax: `command <arg1> [arg2]`
 
 The following would be acceptable: `command hello`, `command hello hi`, `command hello "How are you!"`
 
-As a note: all commands need to start with: `python main.py`. So `python main.py command hello`.
+As a note: all commands need to start with: `python main.py` if you are not running inside of the command terminal. So `python main.py command hello`.
 
 ### Upload
 
