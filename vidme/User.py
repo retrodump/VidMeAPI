@@ -45,7 +45,7 @@ class User:
 				# Add item to class
 				setattr(self, key, value)
 				# Add getter for item
-				setattr(self, 'get_' + key, lambda v=value: v)
+				setattr(self, 'get_' + key, lambda k=key: self._get_safe(k))
 
 	def _retrieve_albums(self, limit=20, offset=0):
 		user_id = self._get_safe('user_id')
@@ -76,6 +76,9 @@ class User:
 				self.albums.extend(albums)
 				offset += limit
 				yield albums
+
+				if len(album) < limit:
+					break
 			else:
 				break
 
@@ -166,6 +169,9 @@ class User:
 				self.followers.extend(followers)
 				offset += limit
 				yield followers
+
+				if len(followers) < limit:
+					break
 			else:
 				break
 
@@ -211,6 +217,9 @@ class User:
 				self.following.extend(following)
 				offset += limit
 				yield following
+
+				if len(following) < limit:
+					break
 			else:
 				break
 
@@ -297,6 +306,9 @@ class User:
 				self.videos.extend(videos)
 				offset += limit
 				yield videos
+
+				if len(videos) < limit:
+					break
 			else:
 				break
 	def get_videos(self, refresh=False, limit=15, offset=0, session=None, order="video_id", private=0):

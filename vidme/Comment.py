@@ -8,18 +8,23 @@ class Comment:
 		self.setup_meta(meta)
 
 	def setup_meta(self, meta):
+		from User import User
+		
 		if meta:
 			self.meta = meta
 
 			for key, value in meta.items():
+				if key == 'user':
+					value = User(meta={'user': value})
 				if key == 'comments':
 					value = [
 						Comment(comment) for comment in value
 					]
+
 				# Add item to class
 				setattr(self, key, value)
 				# Add getter for item
-				setattr(self, 'get_' + key, lambda v=value: v)
+				setattr(self, 'get_' + key, lambda k=key: self._get_safe(k))
 
 	def get_user(self):
 		return False

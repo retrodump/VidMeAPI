@@ -15,12 +15,14 @@ class Like:
 		for key, value in meta.items():
 			if key == 'user':
 				value = User(meta={'user': value})
-				# Add item to class
-				setattr(self, 'user', value)
-				# Add getter for item
-				setattr(self, 'get_' + 'user', lambda v=value: v)
-			else:
-				# Add item to class
-				setattr(self, key, value)
-				# Add getter for item
-				setattr(self, 'get_' + key, lambda v=value: v)
+
+			# Add item to class
+			setattr(self, key, value)
+			# Add getter for item
+			setattr(self, 'get_' + key, lambda k=key: self._get_safe(k))
+
+	def _get_safe(self, name):
+		if hasattr(self, name):
+			return getattr(self, name)
+		else:
+			return False

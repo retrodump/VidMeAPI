@@ -32,7 +32,7 @@ class Album:
 				# Add item to class
 				setattr(self, key, value)
 				# Add getter for item
-				setattr(self, 'get_' + key, lambda v=value: v)
+				setattr(self, 'get_' + key, lambda k=key: self._get_safe(k))
 
 	def _retrieve_videos(self, limit=20, offset=0, session=None, order=None, private=0):
 		from Video import Video
@@ -72,6 +72,9 @@ class Album:
 				self.videos.extend(videos)
 				offset += limit
 				yield videos
+
+				if len(videos) < limit:
+					break
 			else:
 				break
 

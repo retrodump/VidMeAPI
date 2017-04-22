@@ -52,24 +52,17 @@ class Video:
 			for key, value in video.items():
 				if key == 'user':
 					value = User(meta={'user': value})
-					# Add item to class
-					setattr(self, 'user', value)
-					# Add getter for item
-					setattr(self, 'get_' + 'user', lambda v=value: v)
 				elif key == 'formats':
 					tv = {}
 					for form in value:
 						tv[form['type']] = form
 
-					# Add item to class
-					setattr(self, key, value)
-					# Add getter for item
-					setattr(self, 'get_' + key, lambda v=tv: v)
-				else:
-					# Add item to class
-					setattr(self, key, value)
-					# Add getter for item
-					setattr(self, 'get_' + key, lambda v=value: v)
+					value = tv
+					
+				# Add item to class
+				setattr(self, key, value)
+				# Add getter for item
+				setattr(self, 'get_' + key, lambda k=key: self._get_safe(k))
 
 		if 'watchers' in meta:
 			watchers = meta['watchers']
@@ -117,6 +110,9 @@ class Video:
 				self.comments.extend(coms)
 				offset += limit
 				yield coms
+
+				if len(coms) < limit:
+					break
 			else:
 				break
 
@@ -163,6 +159,9 @@ class Video:
 				self.likes.extend(likes)
 				offset += limit
 				yield likes
+
+				if len(likes) < limit:
+					break
 			else:
 				break
 
