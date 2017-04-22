@@ -6,6 +6,7 @@ import json
 import os.path
 import shlex
 import urllib2
+import json
 import time
 
 session = None
@@ -134,14 +135,14 @@ def get_video_by_code(code):
 	# code = "Z47b"
 	return vidme.Video(code = code)
 
-def download_video_by_command(dtype, form, video, uri, **kwargs):
+def download_video_by_command(dtype, form, video, uri, *args):
 	if dtype.lower() == 'video':
 		try:
 			# Get code
 			if video.endswith('/'):
 				video = video[:-1]
 			video = video.split('/')[-1]
-			download_video(form, vidme.Video(code=video), uri, **kwargs)
+			download_video(form, vidme.Video(code=video), uri, *args)
 		except Exception as e:
 			print '[-] ERROR:', e
 	elif dtype.lower() == 'album':
@@ -151,7 +152,7 @@ def download_video_by_command(dtype, form, video, uri, **kwargs):
 		for video_chunk in album.get_videos():
 			for video_to_download in video_chunk:
 				try:
-					download_video(form, video_to_download, uri, **kwargs)
+					download_video(form, video_to_download, uri, *args)
 				except Exception as e:
 					print '[-] ERROR:', e
 	elif dtype.lower() == 'user':
@@ -164,15 +165,63 @@ def download_video_by_command(dtype, form, video, uri, **kwargs):
 
 		for video_chunk in user.get_videos():
 			for video_to_download in video_chunk:
+				# Has formats but only hls. >.>
+				video_to_download = vidme.Video(video_to_download.get_full_url())
 				try:
-					download_video(form, video_to_download, uri, **kwargs)
+					download_video(form, video_to_download, uri, *args)
 				except Exception as e:
 					print '[-] ERROR:', e
 
 # download 480p 0ex2 .
-def download_video(form, video, uri, **kwargs):
+def download_video(form, video, uri, *args):
+	"""
+
+		Helper functions START
+
+	"""
 	def _to_ascii(title):
-		return ''.join([i if ord(i) < 128 else '-' for i in title])
+		return ''.join([i if ord(i) < 128 and i.isalnum() else '-' for i in title])
+
+	def _download_file(url, size=1024 * 5000, chunk_count=-1, no_output=False):
+		count = 0.0
+		start_time = time.time()
+
+		try:
+			file_size = float(url.info().getheaders('Content-Length')[0])
+		except:
+			file_size = 1.0
+
+		if not no_output:
+			print "[*] Dowloading in", size / 1000000.0, "MB sized chunks."
+
+		while chunk_count < 0:
+			data = url.read(size)
+			count += len(data)
+			if not data:
+				break
+
+			yield data
+
+			if not no_output:
+				per_left = count / file_size * 100.0
+
+				out = "[*] Download at: {0:6.2f}%.".format(per_left)
+
+				# Output and go up one line. This is so it auto updates.
+				sys.stdout.write(out + "\r")
+
+			chunk_count -= 1
+
+		if not no_output:
+			print "[*] Download at: {0:6.2f}%. Took: {1:7.2f} seconds.".format(
+				100.0, time.time() - start_time
+			)
+
+	"""
+
+		Helper functions END
+
+	"""
 
 	# Convert title to ascii.
 	video.title = _to_ascii(video.get_title())
@@ -180,7 +229,7 @@ def download_video(form, video, uri, **kwargs):
 	# Get our URI path without extension.
 	final_path = uri + '/' + video.get_title()
 
-	if '--no-overwrites' in kwargs or '-w' in kwargs:
+	if '--no-overwrites' in args or '-w' in args:
 		if os.path.isfile(final_path + ".mp4"):
 			print "[-] File exists. Not downloading."
 			return False
@@ -193,51 +242,17 @@ def download_video(form, video, uri, **kwargs):
 	if not video._get_safe('formats'):
 		video = vidme.Video(video.get_full_url())
 
-	forms = video.get_formats()
+	if '--no-download' not in args:
+		forms = video.get_formats()
 
-	if form not in forms:
-		print "[-] Format not found! ", form
-		return False
-	else:
-		print "[*] Downloading video:", video.get_title()
+		if form not in forms:
+			print "[-] Format not found! ", form
+			return False
+		else:
+			print "[*] Downloading video:", video.get_title()
 
-		def _download_file(url, size=1024 * 2500, chunk_count=-1, no_output=False):
-			count = 0.0
-			start_time = time.time()
-
-			try:
-				file_size = float(url.info().getheaders('Content-Length')[0])
-			except:
-				file_size = 1.0
-
-			if not no_output:
-				print "[*] Dowloading in", size / 1000000.0, "MB sized chunks."
-
-			while chunk_count < 0:
-				data = url.read(size)
-				count += len(data)
-				if not data:
-					break
-
-				yield data
-
-				if not no_output:
-					per_left = count / file_size * 100.0
-
-					out = "[*] Download at: {0:6.2f}%.".format(per_left)
-
-					# Output and go up one line. This is so it auto updates.
-					sys.stdout.write(out + "\r")
-
-				chunk_count -= 1
-
-			if not no_output:
-				print "[*] Download at: {0:6.2f}%. Took: {1:7.2f} seconds.".format(
-					100.0, time.time() - start_time
-				)
-
-		url = forms[form]['uri']
-		success = False
+			url = forms[form]['uri']
+			success = False
 
 		try:
 			video_url = urllib2.urlopen(url)
@@ -254,27 +269,30 @@ def download_video(form, video, uri, **kwargs):
 			print "URL Error:", e.reason, url
 
 		print "[*] Finished downloading."
+	else:
+		success = True
 
-		if success:
-			if '--write-description' in kwargs:
-				with open(final_path + ".description", "wb") as f:
-					f.write(video.get_description())
-			if '--write-comments' in kwargs:
-				with open(final_path + ".comments", "wb") as f:
-					f.write('\r\n'.join([
-							"User: {1}\r\n\r\n{2}\r\n\r\n".format(c.get_username(), c.get_body())
-							for c in video.get_comments()
+	if success:
+		if '--write-description' in args:
+			with open(final_path + ".description", "wb") as f:
+				f.write(video.get_description())
+		if '--write-comments' in args:
+			with open(final_path + ".comments", "wb") as f:
+				for cchunk in video.get_comments():
+					f.write('\r\n\r\n'.join([
+							"CID: {0}\r\nUser: {1}\r\n\r\n{2}".format(c.get_comment_id(), c.get_user().get_username(), c.get_body())
+							for c in cchunk
 						]))
-			if '--write-thumbnail' in kwargs:
-				with open(final_path + ".jpg", "wb") as f:
-					thumbnail_url = urllib2.urlopen(video.get_thumbnail_url())
-					for c in _download_file(thumbnail_url):
-						f.write(c)
-			if '--info-json' in kwargs:
-				with open(final_path + '.info.json', "wb") as f:
-					f.write(video.meta)
+		if '--write-thumbnail' in args:
+			with open(final_path + ".jpg", "wb") as f:
+				thumbnail_url = urllib2.urlopen(video.get_thumbnail_url())
+				for c in _download_file(thumbnail_url):
+					f.write(c)
+		if '--write-info-json' in args:
+			with open(final_path + '.info.json', "wb") as f:
+				json.dump(video.meta, f)
 
-		return True
+	return success
 
 def upload_video_by_command():
 	video_filename = "C:/somedir/another/myvideo.mp4"
@@ -355,7 +373,14 @@ def run_command(cmd, args):
 def start_commandline():
 	while True:
 		line = shlex.split(raw_input("Command: "))
-		run_command(line[0], line[1:])
+
+		if line:
+			try:
+				run_command(line[0], line[1:])
+			except KeyboardInterrupt:
+				pass
+			except Exception as e:
+				print '[-] ERROR:', e
 
 def default_settings(filename):
 	settings = ""
