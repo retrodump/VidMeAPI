@@ -105,7 +105,7 @@ class User:
 	def _api_call(self, session, action, args = {}):
 		user_id = self._get_safe('user_id')
 
-		args['token'] = session.get_token()
+		args['session'] = session
 
 		if user_id:
 			video_action = api.request('/user/' + user_id + '/' + action, data=args)
@@ -273,16 +273,11 @@ class User:
 		
 		user_id = self._get_safe('user_id')
 
-		token = None
-
-		if session:
-			token = session.get_token()
-
 		if user_id:
 			videos = api.request('/videos/list', method="GET", params=dict(
 					private=private,
 					order=order,
-					token=token,
+					session=session,
 					offset=offset,
 					limit=limit,
 					user=user_id

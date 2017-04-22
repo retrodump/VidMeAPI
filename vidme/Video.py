@@ -93,30 +93,28 @@ class Video:
 			), method='GET')
 
 			if comments:
-				return [
-					Comment(comment) for comment in comments['comments']
-				]
-			else:
-				return False
-		else:
-			return False
+				total = comments['page']['total']
+
+				for comment in comments['comments']:
+					yield (Comment(comment), total)
 
 	def _yield_comments(self, limit, offset):
 		self.comments = []
 
 		while True:
 			coms = self._retrieve_comments(limit, offset)
-			if coms and len(coms) > 0:
-				self.comments.extend(coms)
-				offset += limit
-				yield coms
+			total = 0
 
-				if len(coms) < limit:
-					break
-			else:
+			for com in coms:
+				total = com[1]
+				self.comments.append(com[0])
+				offset += 1
+				yield com[0]
+
+			if not coms or offset >= total:
 				break
 
-	def get_comments(self, refresh=False, limit=5, offset=0):
+	def get_comments(self, refresh=False, limit=15, offset=0):
 		comments = self._get_safe('comments')
 
 		# If comments not found, try to retrieve them.
@@ -185,7 +183,7 @@ class Video:
 		if not self.uri:
 			print "[-] No uri given!"
 			return False
-		elif not session.get_token() and not session.new_token():
+		elif not session.get_auth() and not session.new_token():
 			return False
 
 		if start_at:
@@ -203,11 +201,10 @@ class Video:
 				if not title:
 					title = filename
 
-				video_request = api.request('/video/request', data=dict(
+				video_request = api.request('/video/request', session, data=dict(
 					filename=filename,
 					size=self._file_size,
 					title=title,
-					token=session.get_token()
 				))
 
 				if not video_request:
@@ -218,10 +215,9 @@ class Video:
 				if not no_output:
 					print "[+] New Video Code:", self._code
 
-				upload = api.request('/upload/create', data=dict(
+				upload = api.request('/upload/create', session, data=dict(
 					code=self._code,
 					size=self._file_size,
-					token=session.get_token()
 				))
 
 				self._upload_id = upload['upload']['upload_id']
@@ -245,10 +241,9 @@ class Video:
 				print "[+] Video is uploading..."
 
 			for chunk in self._read_chunks(f, self.chunk_size, no_output=no_output):
-				finished_video = api.request('/upload/chunk', params=dict(
+				finished_video = api.request('/upload/chunk', session, params=dict(
 					code=self._code,
 					upload=self._upload_id,
-					token=session.get_token()
 				), extraheaders={
 					'Content-Length': str(len(chunk)),
 					'Content-Range': 'bytes %s-%s/%s' % (self._index, self._index + len(chunk) - 1, self._file_size),
@@ -311,7 +306,7 @@ class Video:
 	def _api_call(self, session, action, args = {}):
 		video_id = self._get_safe('video_id')
 
-		args['token'] = session.get_token()
+		args['session'] = session
 
 		if video_id:
 			video_action = api.request('/video/' + video_id + '/' + action, data=args)
@@ -384,10 +379,7 @@ class Video:
 					file_info = os.stat(thumb)
 					file_size = file_info.st_size
 
-					chunk_request = api.request('/video/' + video_id + '/edit',
-						params=dict(
-							token=session.get_token()
-						),
+					chunk_request = api.request('/video/' + video_id + '/edit', session,
 						files=dict(
 							thumbnail=f
 						)

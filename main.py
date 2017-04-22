@@ -182,7 +182,7 @@ def download_video(form, video, uri, *args):
 	def _to_ascii(title):
 		return ''.join([i if ord(i) < 128 and i.isalnum() else '-' for i in title])
 
-	def _download_file(url, size=1024 * 5000, chunk_count=-1, no_output=False):
+	def _download_file(url, size=1024 * 3000, chunk_count=-1, no_output=False):
 		count = 0.0
 		start_time = time.time()
 

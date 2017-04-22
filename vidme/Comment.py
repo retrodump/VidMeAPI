@@ -44,7 +44,7 @@ class Comment:
 	def _api_call(self, session, action, args = {}):
 		comment_id = self._get_safe('comment_id')
 
-		args['token'] = session.get_token()
+		args['session'] = session
 
 		if comment_id:
 			video_action = api.request('/comment/' + comment_id + '/' + action, data=args)

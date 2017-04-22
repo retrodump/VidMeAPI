@@ -5,15 +5,15 @@ import base64
 
 API_URL = "https://api.vid.me"
 
-def do_request(uri, token=None, method='POST', extraheaders=None, **kwargs):    
+def do_request(uri, session=None, method='POST', extraheaders=None, **kwargs):    
     headers = {
-        'User-Agent': "KingFredrickVI API Interface Bot - https://github.com/KingFredrickVI/VidMeAPI",
+        'User-Agent': "KingFredrickVI API Interface Python Bot - https://github.com/KingFredrickVI/VidMeAPI",
     }
 
     if extraheaders is not None:
         headers.update(extraheaders)
-    if token is not None:
-        headers['AccessToken'] = token
+    if session is not None:
+        headers['AccessToken'] = session.get_token()
 
     func = post
 

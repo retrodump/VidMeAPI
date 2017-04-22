@@ -39,16 +39,11 @@ class Album:
 		
 		album_id = self._get_safe('album_id')
 
-		token = None
-
-		if session:
-			token = session.get_token()
-
 		if album_id:
 			videos = api.request('/album/' + album_id + '/videos', method="GET", params=dict(
 					private=private,
 					order=order,
-					token=token,
+					session=session,
 					offset=offset,
 					limit=limit,
 					album=album_id
@@ -101,7 +96,7 @@ class Album:
 	def _api_call(self, session, action, args = {}):
 		album_id = self._get_safe('album_id')
 
-		args['token'] = session.get_token()
+		args['session'] = session
 
 		if album_id:
 			video_action = api.request('/album/' + album_id + '/' + action, data=args)
@@ -127,7 +122,7 @@ class Album:
 
 		if album_id:
 			video_action = api.request('/album/' + album_id + '/video/' + video_id, params=dict(
-				token=session.get_token()
+				session=session
 			))
 
 			if video_action:
@@ -143,7 +138,7 @@ class Album:
 
 		if album_id:
 			video_action = api.request('/album/' + album_id, params=dict(
-				token=session.get_token()
+				session=session
 			), method='DELETE')
 
 			if video_action:
@@ -157,7 +152,7 @@ class Album:
 			title=title,
 			description=description,
 			url=url,
-			token=session.get_token()
+			session=session
 		))
 
 		if video_action:

@@ -19,8 +19,12 @@ class Session:
 
 		if 'token' in settings and settings['token']:
 			self.token = settings['token']
+			self.auth = True
 		else:
 			self.new_token()
+
+	def get_auth(self):
+		return self.auth
 
 	def get_token(self):
 		return self.token['token']
@@ -47,6 +51,7 @@ class Session:
 
 		if request:
 			self.token = request['auth']
+			self.auth = True
 			return True
 		else:
 			return False
