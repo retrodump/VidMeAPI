@@ -153,7 +153,9 @@ video.upload(session, "Cool title!")
 
 To upload a video, just do:
 
-```python main.py upload "c:/dir/dir/myvideo.mp4" "title" "C:/dir/dir/myThumbnail.jpg"```
+```
+python main.py upload "c:/dir/dir/myvideo.mp4" "title" "C:/dir/dir/myThumbnail.jpg"
+```
 
 If you do not give it a title, the name of the video will be used. You also do not need to give it a thumbnail if you don't want to upload one. After thumbnail, you can give a category id, such as "270" (for Music).
 
