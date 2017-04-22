@@ -81,7 +81,7 @@ Token is returned both when you sign in through username/password and code. Save
 
 (This probably doesn't really make much sense either but check out the Example section below).
 
-From here you're golden! You just pass session around the same if it's username/password or OAuth. Just remember that for each account, you need a new 'session' instance.
+From here you're golden! You just pass session around the same if it's username/password or OAuth. Just remember that for each seperate account, you need a new 'session' instance.
 
 ### Setup
 
