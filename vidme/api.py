@@ -13,7 +13,10 @@ def do_request(uri, session=None, method='POST', extraheaders=None, **kwargs):
     if extraheaders is not None:
         headers.update(extraheaders)
     if session is not None:
-        headers['AccessToken'] = session.get_token()
+        if session.get_token():
+            headers['AccessToken'] = session.get_token()
+        elif session.get_oauth():
+            headers['Authorization'] = session.get_oauth()
 
     func = post
 
