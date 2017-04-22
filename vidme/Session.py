@@ -58,13 +58,9 @@ class Session:
 		if 'code' in settings:
 			self.run_oauth(settings['code'])
 
-		if self.oauth:
-			pass
-		elif ('token' in settings and settings['token']):
+		if 'token' in settings and settings['token']:
 			self.token = settings['token']
 			self.auth = True
-		else:
-			self.new_token()
 
 	def get_auth(self):
 		return self.auth
