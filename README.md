@@ -96,7 +96,8 @@ Flags:
 * `--write-description` - Writes the description of the video to 'title.description'.
 * `--write-comments` - Writes the top-level comments to 'title.comments'. In the future, I need to make this write JSON instead of a custom format. Just dump the comment meta with a key of comment_id.
 * `--write-thumbnail` - Writes the thumbnail of the video to 'title.jpg'.
-* `--info-json` - Writes the video's meta to 'title.info.json'.
+* `--write-info-json` - Writes the video's meta to 'title.info.json'.
+* `--no-download` - Don't download the video.
 
 Examples:
 
@@ -107,14 +108,14 @@ Examples:
 
 * `download video 480p vid.me/qhIM C:\dir\dir\ --write-comments --write-description`
 * `download video 480p vid.me/qhIM C:\dir\dir\ -w`
-* `download video 480p vid.me/qhIM C:\dir\dir\ --info-json`
+* `download video 480p vid.me/qhIM C:\dir\dir\ --write-info-json`
 
 * `download album 480p 90822 C:\dir\dir\`
 
 * `download user 480p kingfredrickvi C:\dir\dir\`
 * `download user 480p KingFredrickVI C:\dir\dir\`
 * `download user 480p vid.me/kingfredrickVI C:\dir\dir\ -w`
-* `download user 480p https://vid.me/kingfredrickvi C:\dir\dir\ --info-json`
+* `download user 480p https://vid.me/kingfredrickvi C:\dir\dir\ --write-info-json`
 
 ## Usage
 
