@@ -105,7 +105,7 @@ class Video:
 			coms = self._retrieve_comments(limit, offset)
 			total = 0
 
-			if com:
+			if coms:
 				for com in coms:
 					total = com[1]
 					self.comments.append(com[0])

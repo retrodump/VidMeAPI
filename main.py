@@ -149,12 +149,11 @@ def download_video_by_command(dtype, form, video, uri, *args):
 		# album_id - 90822
 		album = vidme.Album(video)
 
-		for video_chunk in album.get_videos():
-			for video_to_download in video_chunk:
-				try:
-					download_video(form, video_to_download, uri, *args)
-				except Exception as e:
-					print '[-] ERROR:', e
+		for video_to_download in album.get_videos():
+			try:
+				download_video(form, video_to_download, uri, *args)
+			except Exception as e:
+				print '[-] ERROR:', e
 	elif dtype.lower() == 'user':
 		# Get username
 		if video.endswith('/'):
@@ -163,14 +162,13 @@ def download_video_by_command(dtype, form, video, uri, *args):
 
 		user = vidme.User(video)
 
-		for video_chunk in user.get_videos():
-			for video_to_download in video_chunk:
-				# Has formats but only hls. >.>
-				video_to_download = vidme.Video(video_to_download.get_full_url())
-				try:
-					download_video(form, video_to_download, uri, *args)
-				except Exception as e:
-					print '[-] ERROR:', e
+		for video_to_download in user.get_videos():
+			# Has formats but only hls. >.>
+			video_to_download = vidme.Video(video_to_download.get_full_url())
+			try:
+				download_video(form, video_to_download, uri, *args)
+			except Exception as e:
+				print '[-] ERROR:', e
 
 # download 480p 0ex2 .
 def download_video(form, video, uri, *args):
@@ -278,11 +276,14 @@ def download_video(form, video, uri, *args):
 				f.write(video.get_description())
 		if '--write-comments' in args:
 			with open(final_path + ".comments", "wb") as f:
-				for cchunk in video.get_comments():
-					f.write('\r\n\r\n'.join([
-							"CID: {0}\r\nUser: {1}\r\n\r\n{2}".format(c.get_comment_id(), c.get_user().get_username(), c.get_body())
-							for c in cchunk
-						]))
+				for comment in video.get_comments():
+					f.write("CID: {0}\r\nUser: {1}\r\n\r\n{2}"
+						.format(
+							comment.get_comment_id(),
+							comment.get_user().get_username().encode('ascii', 'ignore'),
+							comment.get_body().encode('ascii', 'ignore')
+						))
+					f.write('\r\n\r\n')
 		if '--write-thumbnail' in args:
 			with open(final_path + ".jpg", "wb") as f:
 				thumbnail_url = urllib2.urlopen(video.get_thumbnail_url())
