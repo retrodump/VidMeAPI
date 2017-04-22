@@ -235,7 +235,7 @@ def download_video(form, video, uri, *args):
 			return False
 
 	if uri.endswith('/') or uri.endswith('\\'):
-		code_or_url = code_or_url[:-1]
+		uri = uri[:-1]
 
 	code = video.get_url()
 
