@@ -102,7 +102,9 @@ Scope is what your program can mess with on that users account. Please browse ht
 
 One last thing: Do not use the built-in OAuth token fetching feature on production lol. Please use HTTPS and a more fancy mechanism. It's there so you can do OAuth testing or local scripts, etc.
 
-### Example
+### Examples
+
+Example 1:
 
 ```
 settings = {
@@ -121,6 +123,8 @@ video = vidme.Video(uri="C:\dir\dir\supervideo.mp4")
 video.upload(session, "Cool title!")
 ```
 
+Example 2:
+
 ```
 settings = {
 	"code": "asoijefoisefsf"
@@ -131,6 +135,8 @@ session = vidme.Session(settings, no_output=True)
 video = vidme.Video(uri="C:\dir\dir\supervideo.mp4")
 video.upload(session, "Cool title!")
 ```
+
+Example 3:
 
 ```
 settings = {
