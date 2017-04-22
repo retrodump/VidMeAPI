@@ -202,32 +202,33 @@ class User:
 		user_id = self._get_safe('user_id')
 
 		if user_id:
-			following = api.request('/user/' + user_id + "/following", method="GET", params=dict(
+			followings = api.request('/user/' + user_id + "/following", method="GET", params=dict(
 					user=user_id,
 					offset=offset,
 					limit=limit,
 				))
 
-			if following:
-				return [
-					User(meta={'user': following}) for following in following['users']
-				]
-			else:
-				return False
-		else:
-			return False
+			if followings:
+				for following in followings['users']:
+					yield (User(meta={'user': following}), followings['page']['total'])
 
 	def _yield_following(self, limit, offset):
 		self.following = []
 
 		while True:
-			following = self._retrieve_following(limit, offset)
-			if following and len(following) > 0:
-				self.following.extend(following)
-				offset += limit
-				yield following
+			followings = self._retrieve_following(limit, offset)
 
-				if len(following) < limit:
+			if followings:
+				total = 0
+
+				for following in followings:
+					self.following.append(following[0])
+					total = following[1]
+					yield following[0]
+
+				offset += limit
+
+				if offset >= total:
 					break
 			else:
 				break
@@ -311,7 +312,7 @@ class User:
 					yield videos
 
 				offset += limit
-				
+
 				if offset >= total:
 					break
 			else:
