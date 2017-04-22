@@ -67,26 +67,27 @@ class User:
 				))
 
 			if albums:
-				return [
-					Album(meta={'album': album}) for album in albums['albums']
-				]
-				return True
-			else:
-				return False
-		else:
-			return False
+				for album in albums['albums']:
+					yield (Album(meta={'album': album}), albums['page']['total'])
 
 	def _yield_albums(self, limit, offset):
 		self.albums = []
 
 		while True:
 			albums = self._retrieve_albums(limit, offset)
-			if albums and len(albums) > 0:
-				self.albums.extend(albums)
-				offset += limit
-				yield albums
 
-				if len(album) < limit:
+			if albums:
+				total = 0
+
+				for album in albums:
+					self.albums.append(album[0])
+					total = album[1]
+					print total
+					yield album[0]
+
+				offset += limit
+
+				if offset >= total:
 					break
 			else:
 				break
