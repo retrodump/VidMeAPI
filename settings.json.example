@@ -1,6 +1,13 @@
 {
 
 	"username": "",
-	"password": ""
+	"password": "",
 
+	"oauth": {
+		"client_id": "",
+		"key": "",
+		"secret": "",
+		"redirect_uri": "http://localhost:5010",
+		"scope": ""
+	}
 }
