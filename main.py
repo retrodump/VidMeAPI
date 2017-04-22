@@ -146,7 +146,7 @@ def download_video_by_command(dtype, form, video, uri, **kwargs):
 			print '[-] ERROR:', e
 	elif dtype.lower() == 'album':
 		# album_id - 90822
-		album = vidme.Album(90822)
+		album = vidme.Album(video)
 
 		for video_chunk in album.get_videos():
 			for video_to_download in video_chunk:
