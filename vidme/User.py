@@ -311,7 +311,7 @@ class User:
 				for video in videos:
 					self.videos.append(video[0])
 					total = video[1]
-					yield videos
+					yield video[0]
 
 				offset += limit
 
