@@ -85,7 +85,10 @@ class Session:
 		self.oauth = True
 
 	def get_oauth(self):
-		return "Basic " + base64.b64encode(self.key + ":" + self.secret)
+		if self.oauth:
+			return "Basic " + base64.b64encode(self.key + ":" + self.secret)
+		else:
+			return False
 
 	def run_oauth(self, code=None):
 		if not code:
