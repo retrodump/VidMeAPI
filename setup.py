@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
   name = 'vidme',
   packages = ['vidme'], # this must be the same as the name above
-  version = '0.8.9',
+  version = '0.8.11',
   description = 'A Python VidMe API interface library that supports oauth.',
   author = 'KingFredrickVI',
   author_email = 'jakewright458@gmail.com',
